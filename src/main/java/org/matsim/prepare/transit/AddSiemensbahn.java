@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
+import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
@@ -12,10 +13,9 @@ import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.pt.transitSchedule.api.*;
 import org.matsim.vehicles.MatsimVehicleReader;
+import org.matsim.vehicles.MatsimVehicleWriter;
 import org.matsim.vehicles.VehicleType;
 
 import java.nio.file.Paths;
@@ -43,7 +43,7 @@ public class AddSiemensbahn {
 		vehicleReader.readFile(vehicleFile.toString());
 
 		// vehicle type
-//		var vehicleType = scenario.getTransitVehicles().getVehicleTypes().get(Id.create("S-Bahn_veh_type", VehicleType.class));
+		var vehicleType = scenario.getTransitVehicles().getVehicleTypes().get(Id.create("S-Bahn_veh_type", VehicleType.class));
 
 		//start and end Siemensbahn (SiBa) and add to network
 		var siba_start = network.getFactory().createNode(Id.createNodeId("siba-start"), new Coord( 389411.28 + 100, 5820691.34 + 100));
@@ -135,6 +135,93 @@ public class AddSiemensbahn {
 		scenario.getTransitSchedule().addStopFacility(stop6_facility_e_w);
 		scenario.getTransitSchedule().addStopFacility(stop7_facility_e_w);
 		scenario.getTransitSchedule().addStopFacility(stop8_facility_e_w);
+
+		// facilities w > e
+		var stop1_facility_w_e = scheduleFactory.createTransitStopFacility(Id.create("Gartenfeld_we", TransitStopFacility.class),siba_end.getCoord(),false);
+		var stop2_facility_w_e = scheduleFactory.createTransitStopFacility(Id.create("Siemensstadt_we", TransitStopFacility.class),Siemensstadt.getCoord(),false);
+		var stop3_facility_w_e = scheduleFactory.createTransitStopFacility(Id.create("Wernerwerk_we", TransitStopFacility.class),Wernerwerk.getCoord(),false);
+		var stop4_facility_w_e = scheduleFactory.createTransitStopFacility(Id.create("Jungfernheide_we", TransitStopFacility.class),Jungfernheide.getCoord(),false);
+		var stop5_facility_w_e = scheduleFactory.createTransitStopFacility(Id.create("Beusselstrasse_we", TransitStopFacility.class),Beusselstrasse.getCoord(),false);
+		var stop6_facility_w_e = scheduleFactory.createTransitStopFacility(Id.create("Westhafen_we", TransitStopFacility.class),Westhafen.getCoord(),false);
+		var stop7_facility_w_e = scheduleFactory.createTransitStopFacility(Id.create("PerlebergerBruecke_we", TransitStopFacility.class),PerlebergerBruecke.getCoord(),false);
+		var stop8_facility_w_e = scheduleFactory.createTransitStopFacility(Id.create("Hauptbahnhof_we", TransitStopFacility.class),Hauptbahnhof.getCoord(),false);
+		stop1_facility_w_e.setLinkId(start_link_w_e.getId());
+		stop2_facility_w_e.setLinkId(cl_we_1.getId());
+		stop3_facility_w_e.setLinkId(cl_we_2.getId());
+		stop4_facility_w_e.setLinkId(cl_we_3.getId());
+		stop5_facility_w_e.setLinkId(cl_we_4.getId());
+		stop6_facility_w_e.setLinkId(cl_we_5.getId());
+		stop7_facility_w_e.setLinkId(cl_we_6.getId());
+		stop8_facility_w_e.setLinkId(cl_we_7.getId());
+//		QUESTION: Is it right not to use end_link_w_e in this case? Think so...
+		scenario.getTransitSchedule().addStopFacility(stop1_facility_w_e);
+		scenario.getTransitSchedule().addStopFacility(stop2_facility_w_e);
+		scenario.getTransitSchedule().addStopFacility(stop3_facility_w_e);
+		scenario.getTransitSchedule().addStopFacility(stop4_facility_w_e);
+		scenario.getTransitSchedule().addStopFacility(stop5_facility_w_e);
+		scenario.getTransitSchedule().addStopFacility(stop6_facility_w_e);
+		scenario.getTransitSchedule().addStopFacility(stop7_facility_w_e);
+		scenario.getTransitSchedule().addStopFacility(stop8_facility_w_e);
+
+		// stations e > w
+		var stop1_e_w=scheduleFactory.createTransitRouteStop(stop1_facility_e_w,0,0);
+		var stop2_e_w=scheduleFactory.createTransitRouteStop(stop2_facility_e_w,100,130);
+		var stop3_e_w=scheduleFactory.createTransitRouteStop(stop3_facility_e_w,197,227);
+		var stop4_e_w=scheduleFactory.createTransitRouteStop(stop4_facility_e_w,298,328);
+		var stop5_e_w=scheduleFactory.createTransitRouteStop(stop5_facility_e_w,459,489);
+		var stop6_e_w=scheduleFactory.createTransitRouteStop(stop6_facility_e_w,631,661);
+		var stop7_e_w=scheduleFactory.createTransitRouteStop(stop7_facility_e_w,735,765);
+		var stop8_e_w=scheduleFactory.createTransitRouteStop(stop8_facility_e_w,855,885);
+
+		// stations w > e
+		var stop1_w_e=scheduleFactory.createTransitRouteStop(stop1_facility_w_e,0,0);
+		var stop2_w_e=scheduleFactory.createTransitRouteStop(stop2_facility_w_e,90,120);
+		var stop3_w_e=scheduleFactory.createTransitRouteStop(stop3_facility_w_e,194,224);
+		var stop4_w_e=scheduleFactory.createTransitRouteStop(stop4_facility_w_e,366,396);
+		var stop5_w_e=scheduleFactory.createTransitRouteStop(stop5_facility_w_e,527,557);
+		var stop6_w_e=scheduleFactory.createTransitRouteStop(stop6_facility_w_e,628,658);
+		var stop7_w_e=scheduleFactory.createTransitRouteStop(stop7_facility_w_e,725,755);
+		var stop8_w_e=scheduleFactory.createTransitRouteStop(stop8_facility_w_e,855,885);
+
+		//route
+		var route_e_w = scheduleFactory.createTransitRoute(Id.create("SiBa_ew", TransitRoute.class),
+				networkRoute_e_w,List.of(stop1_e_w,stop2_e_w,stop3_e_w,stop4_e_w,stop5_e_w,stop6_e_w,stop7_e_w,stop8_e_w),"pt");
+		var route_w_e = scheduleFactory.createTransitRoute(Id.create("SiBa_we", TransitRoute.class),
+				networkRoute_w_e,List.of(stop1_w_e,stop2_w_e,stop3_w_e,stop4_w_e,stop5_w_e,stop6_w_e,stop7_w_e,stop8_w_e),"pt");
+
+		// create departures and vehicles for each departure E > W
+		for (int i = 3 * 3600; i < 24 * 3600; i += 1200) {
+			var departure = scheduleFactory.createDeparture(Id.create("departure_" + i, Departure.class), i);
+			var vehicle = scenario.getTransitVehicles().getFactory().createVehicle(Id.createVehicleId("SiBa_vehicle_ew_" + "100"+i), vehicleType);
+			departure.setVehicleId(vehicle.getId());
+
+			scenario.getTransitVehicles().addVehicle(vehicle);
+			route_e_w.addDeparture(departure);
+		}
+
+		// create departures and vehicles for each departure W > E
+		for (int i = 3 * 3600; i < 24 * 3600; i += 1200) {
+			var departure = scheduleFactory.createDeparture(Id.create("departure_" + i, Departure.class), i);
+			var vehicle = scenario.getTransitVehicles().getFactory().createVehicle(Id.createVehicleId("SiBa_vehicle_we_" + "100" + i), vehicleType);
+			departure.setVehicleId(vehicle.getId());
+
+			scenario.getTransitVehicles().addVehicle(vehicle);
+			route_w_e.addDeparture(departure);
+		}
+
+		// line E > W
+		var line_e_w = scheduleFactory.createTransitLine(Id.create("SiBa_ew", TransitLine.class));
+		line_e_w.addRoute(route_e_w);
+		scenario.getTransitSchedule().addTransitLine(line_e_w);
+
+		// line W > E
+		var line_w_e = scheduleFactory.createTransitLine(Id.create("SiBa_we", TransitLine.class));
+		line_w_e.addRoute(route_w_e);
+		scenario.getTransitSchedule().addTransitLine(line_w_e);
+
+		new NetworkWriter(network).write(root.resolve("network-with-SiBa-20min.xml.gz").toString());
+		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(root.resolve("transit-Schedule-SiBa-20min.xml.gz").toString());
+		new MatsimVehicleWriter(scenario.getTransitVehicles()).writeFile(root.resolve("transit-vehicles-SiBa-20min.xml.gz").toString());
 	}
 
 	private static Link createLink(String id, Node from, Node to) {
