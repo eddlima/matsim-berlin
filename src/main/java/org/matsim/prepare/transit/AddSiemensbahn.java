@@ -216,9 +216,9 @@ public class AddSiemensbahn {
 		line_w_e.addRoute(route_w_e);
 		scenario.getTransitSchedule().addTransitLine(line_w_e);
 
-		new NetworkWriter(network).write(root.resolve("network-with-SiBa-10min.xml.gz").toString());
-		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(root.resolve("transit-Schedule-SiBa-10min.xml.gz").toString());
-		new MatsimVehicleWriter(scenario.getTransitVehicles()).writeFile(root.resolve("transit-vehicles-SiBa-10min.xml.gz").toString());
+		new NetworkWriter(network).write(root.resolve("berlin-v6.4-network-with-SiBa-10min.xml.gz").toString());
+		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(root.resolve("berlin-v6.4-transitSchedule-SiBa-10min.xml.gz").toString());
+		new MatsimVehicleWriter(scenario.getTransitVehicles()).writeFile(root.resolve("berlin-v6.4-transitVehicles-SiBa-10min.xml.gz").toString());
 	}
 
 	private static Link createLink(String id, Node from, Node to) {
