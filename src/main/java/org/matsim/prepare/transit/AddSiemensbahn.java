@@ -18,6 +18,7 @@ import org.matsim.vehicles.MatsimVehicleReader;
 import org.matsim.vehicles.MatsimVehicleWriter;
 import org.matsim.vehicles.VehicleType;
 
+import java.net.MalformedURLException;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Set;
@@ -28,14 +29,15 @@ public class AddSiemensbahn {
 	private static NetworkFactory networkFactory = NetworkUtils.createNetwork().getFactory();
 	private static TransitScheduleFactory scheduleFactory = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getTransitSchedule().getFactory();
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws MalformedURLException {
 
 		var root = Paths.get(".\\input");
 		var scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		// read in existing files
-		var transitSchedule = Paths.get("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.4/input/berlin-v6.4-transitSchedule.xml.gz");
-		var vehicleFile = Paths.get("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.4/input/berlin-v6.4-transitVehicles.xml.gz");
+
+		var transitSchedule = new java.net.URL("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.4/input/berlin-v6.4-transitSchedule.xml.gz");
+		var vehicleFile = new java.net.URL("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.4/input/berlin-v6.4-transitVehicles.xml.gz");
 		new TransitScheduleReader(scenario).readFile(transitSchedule.toString());
 		var network = NetworkUtils.readNetwork("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.4/input/berlin-v6.4-network-with-pt.xml.gz");
 
@@ -45,64 +47,118 @@ public class AddSiemensbahn {
 		// vehicle type
 		var vehicleType = scenario.getTransitVehicles().getVehicleTypes().get(Id.create("S-Bahn_veh_type", VehicleType.class));
 
-		// add new stations (nodes) Siemensbahn to network and get existing stations
-		var PerlebergerBruecke = network.getFactory().createNode(Id.createNodeId("pt_116410_SuburbanRailway"), new Coord( 388719.90, 5821943.81));
-		var Wernerwerk = network.getFactory().createNode(Id.createNodeId("pt_116420_SuburbanRailway"), new Coord(383071.58, 5821884.16));
-		var Siemensstadt = network.getFactory().createNode(Id.createNodeId("pt_116430_SuburbanRailway"), new Coord(382239.50, 5822435.20));
-		var Gartenfeld = network.getFactory().createNode(Id.createNodeId("pt_116440_SuburbanRailway"), new Coord(381269.04, 5823306.29));
-		network.addNode(PerlebergerBruecke);
-		network.addNode(Wernerwerk);
-		network.addNode(Siemensstadt);
-		network.addNode(Gartenfeld);
+		// get existing stations and add new stations (nodes) Siemensbahn to network
 		var Hauptbahnhof = network.getNodes().get(Id.createNodeId("pt_359974_SuburbanRailway"));
+		var PerlebergerBruecke = network.getFactory().createNode(Id.createNodeId("pt_116410_SuburbanRailway"), new Coord( 795604.72, 5829611.59));
 		var Westhafen = network.getNodes().get(Id.createNodeId("pt_473821_SuburbanRailway"));
 		var Beusselstrasse = network.getNodes().get(Id.createNodeId("pt_502749_SuburbanRailway"));
 		var Jungfernheide = network.getNodes().get(Id.createNodeId("pt_397108_SuburbanRailway"));
+			//SiBa
+		var Wernerwerk = network.getFactory().createNode(Id.createNodeId("pt_116420_SuburbanRailway"), new Coord(789976.12, 5829083.16));
+		var Siemensstadt = network.getFactory().createNode(Id.createNodeId("pt_116430_SuburbanRailway"), new Coord(789100.47, 5829563.55));
+		var Gartenfeld = network.getFactory().createNode(Id.createNodeId("pt_116440_SuburbanRailway"), new Coord(788060.58, 5830351.63));
+			//v1
+		var WasserstadtOberhavel_v1 = network.getFactory().createNode(Id.createNodeId("pt_116451_SuburbanRailway"), new Coord(786696.91, 5831618.01));
+		var Hakenfelde_v1 = network.getFactory().createNode(Id.createNodeId("pt_116461_SuburbanRailway"), new Coord(785201.35, 5832268.05));
+			//v2
+		var WasserstadtOberhavel_v2 = network.getFactory().createNode(Id.createNodeId("pt_116452_SuburbanRailway"), new Coord(786589.78, 5831013.36));
+		var Hakenfelde_v2 = network.getFactory().createNode(Id.createNodeId("pt_116462_SuburbanRailway"), new Coord(785169.34, 5831150.76));
 
-		// create new links Siemensbahn and get existing links
+		network.addNode(PerlebergerBruecke);
+			//SiBa
+		network.addNode(Wernerwerk);
+		network.addNode(Siemensstadt);
+		network.addNode(Gartenfeld);
+			//v1
+		network.addNode(WasserstadtOberhavel_v1);
+		network.addNode(Hakenfelde_v1);
+			//v2
+		network.addNode(WasserstadtOberhavel_v2);
+		network.addNode(Hakenfelde_v2);
+
+		// get existing links and create new links Siemensbahn
 		var Hauptbahnhof_PerlebergerBruecke = createLink("pt_359974_SuburbanRailway-pt_116410_SuburbanRailway", Hauptbahnhof, PerlebergerBruecke);
 		var PerlebergerBruecke_Hauptbahnhof = createLink("pt_116410_SuburbanRailway-pt_359974_SuburbanRailway", PerlebergerBruecke, Hauptbahnhof);
 		var PerlebergerBruecke_Westhafen = createLink("pt_116410_SuburbanRailway-pt_473821_SuburbanRailway", PerlebergerBruecke, Westhafen);
 		var Westhafen_PerlebergerBruecke = createLink("pt_473821_SuburbanRailway-pt_116410_SuburbanRailway", Westhafen, PerlebergerBruecke);
+		var Westhafen_Beusselstrasse = network.getLinks().get(Id.createLinkId("pt_473821_SuburbanRailway-pt_502749_SuburbanRailway"));
+		var Beusselstrasse_Westhafen = network.getLinks().get(Id.createLinkId("pt_502749_SuburbanRailway-pt_473821_SuburbanRailway"));
+		var Beusselstrasse_Jungfernheide = network.getLinks().get(Id.createLinkId("pt_502749_SuburbanRailway-pt_397108_SuburbanRailway"));
+		var Jungfernheide_Beusselstrasse = network.getLinks().get(Id.createLinkId("pt_397108_SuburbanRailway-pt_502749_SuburbanRailway"));
+			//SiBa
 		var Jungfernheide_Wernerwerk = createLink("pt_397108_SuburbanRailway-pt_116420_SuburbanRailway", Jungfernheide, Wernerwerk);
 		var Wernerwerk_Jungfernheide = createLink("pt_116420_SuburbanRailway-pt_397108_SuburbanRailway", Wernerwerk, Jungfernheide);
 		var Wernerwerk_Siemensstadt = createLink("pt_116420_SuburbanRailway-pt_116430_SuburbanRailway", Wernerwerk, Siemensstadt);
 		var Siemensstadt_Wernerwerk = createLink("pt_116430_SuburbanRailway-pt_116420_SuburbanRailway", Siemensstadt, Wernerwerk);
 		var Siemensstadt_Gartenfeld = createLink("pt_116430_SuburbanRailway-pt_116440_SuburbanRailway", Siemensstadt, Gartenfeld);
 		var Gartenfeld_Siemensstadt = createLink("pt_116440_SuburbanRailway-pt_116430_SuburbanRailway", Gartenfeld, Siemensstadt);
+			//v1
+		var Gartenfeld_WasserstadtOberhavel_v1 = createLink("pt_116440_SuburbanRailway-pt_116451_SuburbanRailway", Gartenfeld, WasserstadtOberhavel_v1);
+		var WasserstadtOberhavel_v1_Gartenfeld = createLink("pt_116451_SuburbanRailway-pt_116440_SuburbanRailway", WasserstadtOberhavel_v1, Gartenfeld);
+		var WasserstadtOberhavel_v1_Hakenfelde_v1 = createLink("pt_116451_SuburbanRailway-pt_116461_SuburbanRailway", WasserstadtOberhavel_v1, Hakenfelde_v1);
+		var Hakenfelde_v1_WasserstadtOberhavel_v1 = createLink("pt_116461_SuburbanRailway-pt_116451_SuburbanRailway", Hakenfelde_v1, WasserstadtOberhavel_v1);
+			//v2
+		var Gartenfeld_WasserstadtOberhavel_v2 = createLink("pt_116440_SuburbanRailway-pt_116452_SuburbanRailway", Gartenfeld, WasserstadtOberhavel_v2);
+		var WasserstadtOberhavel_v2_Gartenfeld = createLink("pt_116452_SuburbanRailway-pt_116440_SuburbanRailway", WasserstadtOberhavel_v2, Gartenfeld);
+		var WasserstadtOberhavel_v2_Hakenfelde_v2 = createLink("pt_116452_SuburbanRailway-pt_116462_SuburbanRailway", WasserstadtOberhavel_v2, Hakenfelde_v2);
+		var Hakenfelde_v2_WasserstadtOberhavel_v2 = createLink("pt_116462_SuburbanRailway-pt_116452_SuburbanRailway", Hakenfelde_v2, WasserstadtOberhavel_v2);
+
 		network.addLink(Hauptbahnhof_PerlebergerBruecke);
 		network.addLink(PerlebergerBruecke_Hauptbahnhof);
 		network.addLink(PerlebergerBruecke_Westhafen);
 		network.addLink(Westhafen_PerlebergerBruecke);
+			//SiBa
 		network.addLink(Jungfernheide_Wernerwerk);
 		network.addLink(Wernerwerk_Jungfernheide);
 		network.addLink(Wernerwerk_Siemensstadt);
 		network.addLink(Siemensstadt_Wernerwerk);
 		network.addLink(Siemensstadt_Gartenfeld);
 		network.addLink(Gartenfeld_Siemensstadt);
-		var Westhafen_Beusselstrasse = network.getLinks().get(Id.createLinkId("pt_473821_SuburbanRailway-pt_502749_SuburbanRailway"));
-		var Beusselstrasse_Westhafen = network.getLinks().get(Id.createLinkId("pt_502749_SuburbanRailway-pt_473821_SuburbanRailway"));
-		var Beusselstrasse_Jungfernheide = network.getLinks().get(Id.createLinkId("pt_502749_SuburbanRailway-pt_397108_SuburbanRailway"));
-		var Jungfernheide_Beusselstrasse = network.getLinks().get(Id.createLinkId("pt_397108_SuburbanRailway-pt_502749_SuburbanRailway"));
+			//v1
+		network.addLink(Gartenfeld_WasserstadtOberhavel_v1);
+		network.addLink(WasserstadtOberhavel_v1_Gartenfeld);
+		network.addLink(WasserstadtOberhavel_v1_Hakenfelde_v1);
+		network.addLink(Hakenfelde_v1_WasserstadtOberhavel_v1);
+			//v2
+		network.addLink(Gartenfeld_WasserstadtOberhavel_v2);
+		network.addLink(WasserstadtOberhavel_v2_Gartenfeld);
+		network.addLink(WasserstadtOberhavel_v2_Hakenfelde_v2);
+		network.addLink(Hakenfelde_v2_WasserstadtOberhavel_v2);
 
-		// create lace links and get existing lace links
-		var station_PerlebergerBruecke = createLink("pt_116410_SuburbanRailway", PerlebergerBruecke, PerlebergerBruecke);
-		var station_Wernerwerk = createLink("pt_116420_SuburbanRailway", Wernerwerk, Wernerwerk);
-		var station_Siemensstadt = createLink("pt_116430_SuburbanRailway", Siemensstadt, Siemensstadt);
-		var station_Gartenfeld = createLink("pt_116440_SuburbanRailway", Gartenfeld, Gartenfeld);
-		network.addLink(station_PerlebergerBruecke);
-		network.addLink(station_Wernerwerk);
-		network.addLink(station_Siemensstadt);
-		network.addLink(station_Gartenfeld);
+		// get existing lace links and create lace links
 		var station_Hauptbahnhof = network.getLinks().get(Id.createLinkId("pt_359974_SuburbanRailway"));
+		var station_PerlebergerBruecke = createLink("pt_116410_SuburbanRailway", PerlebergerBruecke, PerlebergerBruecke);
 		var station_Westhafen = network.getLinks().get(Id.createLinkId("pt_473821_SuburbanRailway"));
 		var station_Beusselstrasse = network.getLinks().get(Id.createLinkId("pt_502749_SuburbanRailway"));
 		var station_Jungfernheide = network.getLinks().get(Id.createLinkId("pt_397108_SuburbanRailway"));
+			//SiBa
+		var station_Wernerwerk = createLink("pt_116420_SuburbanRailway", Wernerwerk, Wernerwerk);
+		var station_Siemensstadt = createLink("pt_116430_SuburbanRailway", Siemensstadt, Siemensstadt);
+		var station_Gartenfeld = createLink("pt_116440_SuburbanRailway", Gartenfeld, Gartenfeld);
+			//v1
+		var station_WasserstadtOberhavel_v1 = createLink("pt_116451_SuburbanRailway", WasserstadtOberhavel_v1, WasserstadtOberhavel_v1);
+		var station_Hakenfelde_v1 = createLink("pt_116461_SuburbanRailway", Hakenfelde_v1, Hakenfelde_v1);
+			//v2
+		var station_WasserstadtOberhavel_v2 = createLink("pt_116452_SuburbanRailway", WasserstadtOberhavel_v2, WasserstadtOberhavel_v2);
+		var station_Hakenfelde_v2 = createLink("pt_116462_SuburbanRailway", Hakenfelde_v2, Hakenfelde_v2);
 
-		// network route e > w and w > e
+		network.addLink(station_PerlebergerBruecke);
+			//SiBa
+		network.addLink(station_Wernerwerk);
+		network.addLink(station_Siemensstadt);
+		network.addLink(station_Gartenfeld);
+			//v1
+		network.addLink(station_WasserstadtOberhavel_v1);
+		network.addLink(station_Hakenfelde_v1);
+			//v2
+		network.addLink(station_WasserstadtOberhavel_v2);
+		network.addLink(station_Hakenfelde_v2);
+
+
+		// network route e > w and w > e --> ORGANIZE!!
 		NetworkRoute networkRoute_e_w = RouteUtils.createLinkNetworkRouteImpl(station_Hauptbahnhof.getId(),
 				List.of(Hauptbahnhof_PerlebergerBruecke.getId(),station_PerlebergerBruecke.getId(),PerlebergerBruecke_Westhafen.getId(),station_Westhafen.getId(),Westhafen_Beusselstrasse.getId(),station_Beusselstrasse.getId(),
-						Beusselstrasse_Jungfernheide.getId(),station_Jungfernheide.getId(),Jungfernheide_Wernerwerk.getId(),station_Wernerwerk.getId(),Wernerwerk_Siemensstadt.getId(),station_Siemensstadt.getId(),Siemensstadt_Gartenfeld.getId()),station_Gartenfeld.getId());
+						Beusselstrasse_Jungfernheide.getId(),station_Jungfernheide.getId(),Jungfernheide_Wernerwerk.getId(), station_Wernerwerk.getId(),Wernerwerk_Siemensstadt.getId(),station_Siemensstadt.getId(),Siemensstadt_Gartenfeld.getId()),station_Gartenfeld.getId());
 
 		NetworkRoute networkRoute_w_e = RouteUtils.createLinkNetworkRouteImpl(station_Gartenfeld.getId(),
 				List.of(Gartenfeld_Siemensstadt.getId(),station_Siemensstadt.getId(),Siemensstadt_Wernerwerk.getId(),station_Wernerwerk.getId(),Wernerwerk_Jungfernheide.getId(),station_Jungfernheide.getId(),
@@ -114,25 +170,48 @@ public class AddSiemensbahn {
 		var stop3_facility_e_w = scheduleFactory.createTransitStopFacility(Id.create("Westhafen_e_w", TransitStopFacility.class),Westhafen.getCoord(),false);
 		var stop4_facility_e_w = scheduleFactory.createTransitStopFacility(Id.create("Beusselstrasse_e_w", TransitStopFacility.class),Beusselstrasse.getCoord(),false);
 		var stop5_facility_e_w = scheduleFactory.createTransitStopFacility(Id.create("Jungfernheide_e_w", TransitStopFacility.class),Jungfernheide.getCoord(),false);
+			//SiBa
 		var stop6_facility_e_w = scheduleFactory.createTransitStopFacility(Id.create("Wernerwerk_e_w", TransitStopFacility.class),Wernerwerk.getCoord(),false);
 		var stop7_facility_e_w = scheduleFactory.createTransitStopFacility(Id.create("Siemensstadt_e_w", TransitStopFacility.class),Siemensstadt.getCoord(),false);
 		var stop8_facility_e_w = scheduleFactory.createTransitStopFacility(Id.create("Gartenfeld_e_w", TransitStopFacility.class),Gartenfeld.getCoord(),false);
+			//v1
+		var stop91_facility_e_w = scheduleFactory.createTransitStopFacility(Id.create("WasserstadtOberhavel_v1_e_w", TransitStopFacility.class),WasserstadtOberhavel_v1.getCoord(),false);
+		var stop101_facility_e_w = scheduleFactory.createTransitStopFacility(Id.create("Hakenfelde_v1_e_w", TransitStopFacility.class),Hakenfelde_v1.getCoord(),false);
+			//v2
+		var stop92_facility_e_w = scheduleFactory.createTransitStopFacility(Id.create("WasserstadtOberhavel_v2_e_w", TransitStopFacility.class),WasserstadtOberhavel_v1.getCoord(),false);
+		var stop102_facility_e_w = scheduleFactory.createTransitStopFacility(Id.create("Hakenfelde_v2_e_w", TransitStopFacility.class),Hakenfelde_v1.getCoord(),false);
+
 		stop1_facility_e_w.setLinkId(station_Hauptbahnhof.getId());
 		stop2_facility_e_w.setLinkId(station_PerlebergerBruecke.getId());
 		stop3_facility_e_w.setLinkId(station_Westhafen.getId());
 		stop4_facility_e_w.setLinkId(station_Beusselstrasse.getId());
 		stop5_facility_e_w.setLinkId(station_Jungfernheide.getId());
+			//SiBa
 		stop6_facility_e_w.setLinkId(station_Wernerwerk.getId());
 		stop7_facility_e_w.setLinkId(station_Siemensstadt.getId());
 		stop8_facility_e_w.setLinkId(station_Gartenfeld.getId());
+			//v1
+		stop91_facility_e_w.setLinkId((station_WasserstadtOberhavel_v1).getId());
+		stop101_facility_e_w.setLinkId((station_Hakenfelde_v1).getId());
+			//v2
+		stop92_facility_e_w.setLinkId((station_WasserstadtOberhavel_v2).getId());
+		stop102_facility_e_w.setLinkId((station_Hakenfelde_v2).getId());
+
 		scenario.getTransitSchedule().addStopFacility(stop1_facility_e_w);
 		scenario.getTransitSchedule().addStopFacility(stop2_facility_e_w);
 		scenario.getTransitSchedule().addStopFacility(stop3_facility_e_w);
 		scenario.getTransitSchedule().addStopFacility(stop4_facility_e_w);
 		scenario.getTransitSchedule().addStopFacility(stop5_facility_e_w);
+			//SiBa
 		scenario.getTransitSchedule().addStopFacility(stop6_facility_e_w);
 		scenario.getTransitSchedule().addStopFacility(stop7_facility_e_w);
 		scenario.getTransitSchedule().addStopFacility(stop8_facility_e_w);
+			//v1
+		scenario.getTransitSchedule().addStopFacility(stop91_facility_e_w);
+		scenario.getTransitSchedule().addStopFacility(stop101_facility_e_w);
+			//v2
+		scenario.getTransitSchedule().addStopFacility(stop92_facility_e_w);
+		scenario.getTransitSchedule().addStopFacility(stop102_facility_e_w);
 
 		// facilities w > e
 		var stop1_facility_w_e = scheduleFactory.createTransitStopFacility(Id.create("Gartenfeld_w_e", TransitStopFacility.class),Gartenfeld.getCoord(),false);
