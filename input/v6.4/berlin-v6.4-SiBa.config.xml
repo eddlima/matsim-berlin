@@ -20,7 +20,7 @@
 		<param name="numberOfThreads" value="16"/>
 	</module>
 	<module name="network">
-		<param name="inputNetworkFile" value="../berlin-v6.4-network-SiBa_Shuttle-1min.xml.gz"/>
+		<param name="inputNetworkFile" value="../berlin-v6.4-network-SiBa-10min.xml.gz"/>
 	</module>
 	<module name="plans">
 		<param name="inputPlansFile" value="../gartenfeld-v6.4.population-full-1pct.xml.gz"/>
@@ -30,9 +30,9 @@
 		<param name="vehiclesFile" value="./berlin-v6.4-vehicleTypes.xml"/>
 	</module>
 	<module name="transit">
-		<param name="transitScheduleFile" value="../berlin-v6.4-transitSchedule-SiBa_Shuttle-1min.xml.gz"/>
+		<param name="transitScheduleFile" value="../berlin-v6.4-transitSchedule-SiBa-10min.xml.gz"/>
 		<param name="useTransit" value="true"/>
-		<param name="vehiclesFile" value="../berlin-v6.4-transitVehicles-SiBa_Shuttle-1min.xml.gz"/>
+		<param name="vehiclesFile" value="../berlin-v6.4-transitVehicles-SiBa-10min.xml.gz"/>
 	</module>
 	<module name="facilities">
 		<param name="facilitiesSource" value="fromFile"/>

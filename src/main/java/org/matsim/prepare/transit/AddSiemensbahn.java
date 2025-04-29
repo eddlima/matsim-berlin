@@ -303,7 +303,7 @@ public class AddSiemensbahn {
 		scenario.getTransitSchedule().addStopFacility(stop102_facility_w_e);*/
 
 		// stations e > w
-		/*	//Base Case
+			//Base Case
 		var stop1_e_w=scheduleFactory.createTransitRouteStop(stop1_facility_e_w,0,0);
 		var stop2_e_w=scheduleFactory.createTransitRouteStop(stop2_facility_e_w,100,130);
 		var stop3_e_w=scheduleFactory.createTransitRouteStop(stop3_facility_e_w,197,227);
@@ -312,8 +312,8 @@ public class AddSiemensbahn {
 			//SiBa
 		var stop6_e_w=scheduleFactory.createTransitRouteStop(stop6_facility_e_w,631,661);
 		var stop7_e_w=scheduleFactory.createTransitRouteStop(stop7_facility_e_w,735,765);
-		var stop8_e_w=scheduleFactory.createTransitRouteStop(stop8_facility_e_w,855,885);*/
-			//SiBa Shuttle
+		var stop8_e_w=scheduleFactory.createTransitRouteStop(stop8_facility_e_w,855,885);
+		/*	//SiBa Shuttle
 		var stop1_e_w=scheduleFactory.createTransitRouteStop(stop1_facility_e_w,0,0);
 		var stop2_e_w=scheduleFactory.createTransitRouteStop(stop2_facility_e_w,1,2);
 		var stop3_e_w=scheduleFactory.createTransitRouteStop(stop3_facility_e_w,3,4);
@@ -321,7 +321,7 @@ public class AddSiemensbahn {
 		var stop5_e_w=scheduleFactory.createTransitRouteStop(stop5_facility_e_w,7,8);
 		var stop6_e_w=scheduleFactory.createTransitRouteStop(stop6_facility_e_w,9,10);
 		var stop7_e_w=scheduleFactory.createTransitRouteStop(stop7_facility_e_w,11,12);
-		var stop8_e_w=scheduleFactory.createTransitRouteStop(stop8_facility_e_w,13,14);
+		var stop8_e_w=scheduleFactory.createTransitRouteStop(stop8_facility_e_w,13,14);*/
 		/*	//SiBa+v1
 		var stop9_e_w=scheduleFactory.createTransitRouteStop(stop91_facility_e_w,1008,1038);
 		var stop10_e_w=scheduleFactory.createTransitRouteStop(stop101_facility_e_w,1150,1180);*/
@@ -337,23 +337,23 @@ public class AddSiemensbahn {
 		var stop4_w_e=scheduleFactory.createTransitRouteStop(stop2_facility_w_e,329,359);
 		var stop5_w_e=scheduleFactory.createTransitRouteStop(stop1_facility_w_e,459,489);*/
 			//SiBa: Gartenfeld > Hauptbahnhof
-		/*var stop1_w_e=scheduleFactory.createTransitRouteStop(stop8_facility_w_e,0,0);
+		var stop1_w_e=scheduleFactory.createTransitRouteStop(stop8_facility_w_e,0,0);
 		var stop2_w_e=scheduleFactory.createTransitRouteStop(stop7_facility_w_e,90,120);
 		var stop3_w_e=scheduleFactory.createTransitRouteStop(stop6_facility_w_e,194,224);
 		var stop4_w_e=scheduleFactory.createTransitRouteStop(stop5_facility_w_e,366,396);
 		var stop5_w_e=scheduleFactory.createTransitRouteStop(stop4_facility_w_e,527,557);
 		var stop6_w_e=scheduleFactory.createTransitRouteStop(stop3_facility_w_e,628,658);
 		var stop7_w_e=scheduleFactory.createTransitRouteStop(stop2_facility_w_e,725,755);
-		var stop8_w_e=scheduleFactory.createTransitRouteStop(stop1_facility_w_e,855,885);*/
+		var stop8_w_e=scheduleFactory.createTransitRouteStop(stop1_facility_w_e,855,885);
 			//SiBa Shuttle
-		var stop1_w_e=scheduleFactory.createTransitRouteStop(stop8_facility_w_e,0,0);
+		/*var stop1_w_e=scheduleFactory.createTransitRouteStop(stop8_facility_w_e,0,0);
 		var stop2_w_e=scheduleFactory.createTransitRouteStop(stop7_facility_w_e,1,2);
 		var stop3_w_e=scheduleFactory.createTransitRouteStop(stop6_facility_w_e,3,4);
 		var stop4_w_e=scheduleFactory.createTransitRouteStop(stop5_facility_w_e,5,6);
 		var stop5_w_e=scheduleFactory.createTransitRouteStop(stop4_facility_w_e,7,8);
 		var stop6_w_e=scheduleFactory.createTransitRouteStop(stop3_facility_w_e,9,10);
 		var stop7_w_e=scheduleFactory.createTransitRouteStop(stop2_facility_w_e,11,12);
-		var stop8_w_e=scheduleFactory.createTransitRouteStop(stop1_facility_w_e,13,14);
+		var stop8_w_e=scheduleFactory.createTransitRouteStop(stop1_facility_w_e,13,14);*/
 			//SiBa+v1: Hakenfelde_v1 > Hauptbahnhof
 		/*var stop1_w_e=scheduleFactory.createTransitRouteStop(stop101_facility_w_e,0,0);
 		var stop2_w_e=scheduleFactory.createTransitRouteStop(stop91_facility_w_e,112,142);
@@ -379,15 +379,15 @@ public class AddSiemensbahn {
 
 		//route
 
-		var route_e_w = scheduleFactory.createTransitRoute(Id.create("SiBa_Shuttle_e_w", TransitRoute.class),
+		var route_e_w = scheduleFactory.createTransitRoute(Id.create("SiBa_e_w", TransitRoute.class),
 				networkRoute_e_w,List.of(stop1_e_w,stop2_e_w,stop3_e_w,stop4_e_w,stop5_e_w,stop6_e_w,stop7_e_w,stop8_e_w/*,stop9_e_w,stop10_e_w*/),"pt");
-		var route_w_e = scheduleFactory.createTransitRoute(Id.create("SiBa_Shuttle_w_e", TransitRoute.class),
+		var route_w_e = scheduleFactory.createTransitRoute(Id.create("SiBa_w_e", TransitRoute.class),
 				networkRoute_w_e,List.of(stop1_w_e,stop2_w_e,stop3_w_e,stop4_w_e,stop5_w_e,stop6_w_e,stop7_w_e,stop8_w_e/*,stop9_w_e,stop10_w_e*/),"pt");
 
 		// create departures and vehicles for each departure E > W
-		for (int i = 3 * 3600; i < 24 * 3600; i += 60) {
+		for (int i = 3 * 3600; i < 24 * 3600; i += 600) {
 			var departure = scheduleFactory.createDeparture(Id.create("departure_" + i, Departure.class), i);
-			var vehicle = scenario.getTransitVehicles().getFactory().createVehicle(Id.createVehicleId("SiBa_Shuttle_vehicle_e_w_" + "100" + i), vehicleType);
+			var vehicle = scenario.getTransitVehicles().getFactory().createVehicle(Id.createVehicleId("SiBa_vehicle_e_w_" + "100" + i), vehicleType);
 			departure.setVehicleId(vehicle.getId());
 
 			scenario.getTransitVehicles().addVehicle(vehicle);
@@ -395,9 +395,9 @@ public class AddSiemensbahn {
 		}
 
 		// create departures and vehicles for each departure W > E
-		for (int i = 3 * 3600; i < 24 * 3600; i += 60) {
+		for (int i = 3 * 3600; i < 24 * 3600; i += 600) {
 			var departure = scheduleFactory.createDeparture(Id.create("departure_" + i, Departure.class), i);
-			var vehicle = scenario.getTransitVehicles().getFactory().createVehicle(Id.createVehicleId("SiBa_Shuttle_vehicle_w_e_" + "100" + i), vehicleType);
+			var vehicle = scenario.getTransitVehicles().getFactory().createVehicle(Id.createVehicleId("SiBa_vehicle_w_e_" + "100" + i), vehicleType);
 			departure.setVehicleId(vehicle.getId());
 
 			scenario.getTransitVehicles().addVehicle(vehicle);
@@ -405,26 +405,26 @@ public class AddSiemensbahn {
 		}
 
 		// line E > W
-		var line_e_w = scheduleFactory.createTransitLine(Id.create("SiBa_Shuttle_e_w", TransitLine.class));
+		var line_e_w = scheduleFactory.createTransitLine(Id.create("SiBa_e_w", TransitLine.class));
 		line_e_w.addRoute(route_e_w);
 		scenario.getTransitSchedule().addTransitLine(line_e_w);
 
 		// line W > E
-		var line_w_e = scheduleFactory.createTransitLine(Id.create("SiBa_Shuttle_w_e", TransitLine.class));
+		var line_w_e = scheduleFactory.createTransitLine(Id.create("SiBa_w_e", TransitLine.class));
 		line_w_e.addRoute(route_w_e);
 		scenario.getTransitSchedule().addTransitLine(line_w_e);
 
-		new NetworkWriter(network).write(root.resolve("berlin-v6.4-network-SiBa_Shuttle-1min.xml.gz").toString());
-		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(root.resolve("berlin-v6.4-transitSchedule-SiBa_Shuttle-1min.xml.gz").toString());
-		new MatsimVehicleWriter(scenario.getTransitVehicles()).writeFile(root.resolve("berlin-v6.4-transitVehicles-SiBa_Shuttle-1min.xml.gz").toString());
+		new NetworkWriter(network).write(root.resolve("berlin-v6.4-network-SiBa-10min.xml.gz").toString());
+		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(root.resolve("berlin-v6.4-transitSchedule-SiBa-10min.xml.gz").toString());
+		new MatsimVehicleWriter(scenario.getTransitVehicles()).writeFile(root.resolve("berlin-v6.4-transitVehicles-SiBa-10min.xml.gz").toString());
 	}
 
 	private static Link createLink(String id, Node from, Node to) {
 
 		var connection = networkFactory.createLink(Id.createLinkId(id), from, to);
 		connection.setAllowedModes(Set.of(TransportMode.pt));
-		connection.setFreespeed(1000);
-		connection.setCapacity(100000);
+		connection.setFreespeed(100);
+		connection.setCapacity(10000);
 		return connection;
 
 	}
