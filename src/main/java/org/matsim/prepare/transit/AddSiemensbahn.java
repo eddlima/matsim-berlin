@@ -595,7 +595,7 @@ public class AddSiemensbahn {
 			networkBusRoute_e_w,List.of(stop01_bus_e_w,stop02_bus_e_w,stop03_bus_e_w,stop04_bus_e_w,stop05_bus_e_w,stop06_bus_e_w,stop07_bus_e_w,stop08_bus_e_w,
 				stop09_bus_e_w,stop10_bus_e_w,stop11_bus_e_w,stop12_bus_e_w,stop13_bus_e_w),"pt");
 		var route_bus_w_e = scheduleFactory.createTransitRoute(Id.create("239_w_e", TransitRoute.class),
-			networkBusRoute_e_w,List.of(stop01_bus_w_e,stop02_bus_w_e,stop03_bus_w_e,stop04_bus_w_e,stop05_bus_w_e,stop06_bus_w_e,stop07_bus_w_e,stop08_bus_w_e,
+			networkBusRoute_w_e,List.of(stop01_bus_w_e,stop02_bus_w_e,stop03_bus_w_e,stop04_bus_w_e,stop05_bus_w_e,stop06_bus_w_e,stop07_bus_w_e,stop08_bus_w_e,
 				stop09_bus_w_e,stop10_bus_w_e,stop11_bus_w_e,stop12_bus_w_e,stop13_bus_w_e),"pt");
 
 		// create departures and vehicles for each departure E > W
@@ -658,9 +658,9 @@ public class AddSiemensbahn {
 		line_bus_w_e.addRoute(route_bus_e_w);
 		scenario.getTransitSchedule().addTransitLine(line_bus_w_e);
 
-		new NetworkWriter(network).write(root.resolve("berlin-v6.4-network-SiBa-10min.xml.gz").toString());
-		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(root.resolve("berlin-v6.4-transitSchedule-SiBa-10min.xml.gz").toString());
-		new MatsimVehicleWriter(scenario.getTransitVehicles()).writeFile(root.resolve("berlin-v6.4-transitVehicles-SiBa-10min.xml.gz").toString());
+		new NetworkWriter(network).write(root.resolve("berlin-v6.4-network-SiBa+Bus-10min.xml.gz").toString());
+		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(root.resolve("berlin-v6.4-transitSchedule-SiBa+Bus-10min.xml.gz").toString());
+		new MatsimVehicleWriter(scenario.getTransitVehicles()).writeFile(root.resolve("berlin-v6.4-transitVehicles-SiBa+Bus-10min.xml.gz").toString());
 	}
 
 	private static Link createLink(String id, Node from, Node to) {
