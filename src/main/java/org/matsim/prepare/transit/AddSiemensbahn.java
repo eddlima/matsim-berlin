@@ -14,9 +14,12 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.api.*;
+import org.matsim.pt.utils.TransitScheduleValidator;
 import org.matsim.vehicles.MatsimVehicleReader;
 import org.matsim.vehicles.MatsimVehicleWriter;
 import org.matsim.vehicles.VehicleType;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.net.MalformedURLException;
 import java.nio.file.Paths;
@@ -28,6 +31,7 @@ public class AddSiemensbahn {
 	private static LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 	private static NetworkFactory networkFactory = NetworkUtils.createNetwork().getFactory();
 	private static TransitScheduleFactory scheduleFactory = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getTransitSchedule().getFactory();
+	private static final Logger log = LogManager.getLogger(AddSiemensbahn.class);
 
 	public static void main(String[] args) throws MalformedURLException {
 
@@ -276,7 +280,7 @@ public class AddSiemensbahn {
 		//Bus
 		NetworkRoute networkBusRoute_e_w = RouteUtils.createLinkNetworkRouteImpl(station_UPaulsternstrasse.getId(),
 			List.of(UPaulsternstrasse_PaulsternstrasseGartenfeldenerstrasse.getId(),station_PaulsternstrasseGartenfeldenerstrasse.getId(),PaulsternstrasseGartenfeldenerstrasse_SGartenfeld.getId(),station_SGartenfeld.getId(),SGartenfeld_NeuesGartenfeldOst.getId(),station_NeuesGartenfeldOst.getId(),
-				NeuesGartenfeldOst_NeuesGartenfeldWest.getId(),station_NeuesGartenfeldWest.getId(),NeuesGartenfeldWest_KolonieHaselbusch.getId(), station_KolonieHaselbusch.getId(),KolonieHaselbusch_DaumstrasseRhenaniastrasse.getId(),station_DaumstrasseRhenaniastrasse.getId(),DaumstrasseRhenaniastrasse_Haveleck.getId(),
+				NeuesGartenfeldOst_NeuesGartenfeldWest.getId(),station_NeuesGartenfeldWest.getId(),NeuesGartenfeldWest_KolonieHaselbusch.getId(),station_KolonieHaselbusch.getId(),KolonieHaselbusch_DaumstrasseRhenaniastrasse.getId(),station_DaumstrasseRhenaniastrasse.getId(),DaumstrasseRhenaniastrasse_Haveleck.getId(),
 				station_Haveleck.getId(),Haveleck_Ashdodstrasse.getId(),station_Ashdodstrasse.getId(),Ashdodstrasse_GoltzstrasseRauchstrasse.getId(),station_GoltzstrasseRauchstrasse.getId(),GoltzstrasseRauchstrasse_MertensstrasseGoltzstrasse.getId(),station_MertensstrasseGoltzstrasse.getId(),MertensstrasseGoltzstrasse_Mertensstrasse.getId(),
 				station_Mertensstrasse.getId(),Mertensstrasse_Werderstrasse.getId()),station_Werderstrasse.getId());
 		NetworkRoute networkBusRoute_w_e = RouteUtils.createLinkNetworkRouteImpl(station_Werderstrasse.getId(),
@@ -622,7 +626,7 @@ public class AddSiemensbahn {
 		//S-Bahn
 		for (int i = 3 * 3600; i < 24 * 3600; i += 600) {
 			var departure = scheduleFactory.createDeparture(Id.create("departure_" + i, Departure.class), i);
-			var vehicle = scenario.getTransitVehicles().getFactory().createVehicle(Id.createVehicleId("SiBa_w_e_" + "100" + i), vehicleTypeSBahn);
+			var vehicle = scenario.getTransitVehicles().getFactory().createVehicle(Id.createVehicleId("SiBa_vehicle_w_e_" + "100" + i), vehicleTypeSBahn);
 			departure.setVehicleId(vehicle.getId());
 
 			scenario.getTransitVehicles().addVehicle(vehicle);
@@ -657,6 +661,19 @@ public class AddSiemensbahn {
 		var line_bus_w_e = scheduleFactory.createTransitLine(Id.create("239_w_e", TransitLine.class));
 		line_bus_w_e.addRoute(route_bus_e_w);
 		scenario.getTransitSchedule().addTransitLine(line_bus_w_e);
+
+		//Check schedule and network
+		TransitScheduleValidator.ValidationResult checkResult = TransitScheduleValidator.validateAll(scenario.getTransitSchedule(), scenario.getNetwork());
+		List<String> warnings = checkResult.getWarnings();
+		if (!warnings.isEmpty())
+			log.warn("TransitScheduleValidator warnings: {}", String.join("\n", warnings));
+
+		if (checkResult.isValid()) {
+			log.info("TransitSchedule and Network valid according to TransitScheduleValidator");
+		} else {
+			log.error("TransitScheduleValidator errors: {}", String.join("\n", checkResult.getErrors()));
+			throw new RuntimeException("TransitSchedule and/or Network invalid");
+		}
 
 		new NetworkWriter(network).write(root.resolve("berlin-v6.4-network-SiBa+Bus-10min.xml.gz").toString());
 		new TransitScheduleWriter(scenario.getTransitSchedule()).writeFile(root.resolve("berlin-v6.4-transitSchedule-SiBa+Bus-10min.xml.gz").toString());
