@@ -6,8 +6,8 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=64G
-#SBATCH --mail-user=eduardo.lima@outlook.de
-#SBATCH --job-name=SiBa-Shuttle-1min-1pct
+#SBATCH --mail-user="e.de.almeida.lima@campus.tu-berlin.de"
+#SBATCH --job-name=SiBa+Bus-10min-1pct
 
 date
 hostname

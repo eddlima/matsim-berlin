@@ -9,6 +9,7 @@ import org.matsim.api.core.v01.network.NetworkWriter;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkUtils;
+import org.matsim.core.network.io.MatsimNetworkReader;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteUtils;
@@ -43,7 +44,9 @@ public class AddSiemensbahn {
 		var transitSchedule = new java.net.URL("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.4/input/berlin-v6.4-transitSchedule.xml.gz");
 		var vehicleFile = new java.net.URL("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/berlin/berlin-v6.4/input/berlin-v6.4-transitVehicles.xml.gz");
 		new TransitScheduleReader(scenario).readFile(transitSchedule.toString());
-		var network = NetworkUtils.readNetwork("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/gartenfeld/input/gartenfeld-v6.4.network.xml.gz");
+		MatsimNetworkReader networkReader = new MatsimNetworkReader(scenario.getNetwork());
+		networkReader.readFile("https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/scenarios/countries/de/gartenfeld/input/gartenfeld-v6.4.network.xml.gz");
+		var network = scenario.getNetwork();
 
 		MatsimVehicleReader vehicleReader = new MatsimVehicleReader(scenario.getTransitVehicles());
 		vehicleReader.readFile(vehicleFile.toString());
@@ -659,7 +662,7 @@ public class AddSiemensbahn {
 		scenario.getTransitSchedule().addTransitLine(line_w_e);
 		//Bus
 		var line_bus_w_e = scheduleFactory.createTransitLine(Id.create("239_w_e", TransitLine.class));
-		line_bus_w_e.addRoute(route_bus_e_w);
+		line_bus_w_e.addRoute(route_bus_w_e);
 		scenario.getTransitSchedule().addTransitLine(line_bus_w_e);
 
 		//Check schedule and network
