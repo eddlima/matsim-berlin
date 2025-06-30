@@ -34,7 +34,7 @@ persons_joined %>% summarise(score_diff_avg = mean(score_diff_monetarized))
 # benefit for cost-benefit analysis (* sample upscale factor 10 or 100)
 persons_joined %>% summarise(score_diff_sum = sum(score_diff_monetarized)) 
 
-# * 365: benefit ca. 34 Mio. Euro / year --> Working days?
+# * 365: benefit ca. 34 Mio. Euro / year
 persons_joined %>% summarise(score_diff_sum = sum(score_diff_monetarized)) * 365 * 100
 
 # Verteilungskurven und Mittelwerte Score-Differenz. Hier für alle Agenten, besser zusätzlich noch für die Agenten im Untersuchungsgebiet
@@ -68,7 +68,7 @@ base_case_trav_time <- base_case_trips %>%
     trav_time = sum(trav_time, na.rm = TRUE),
     wait_time = sum(wait_time, na.rm = TRUE),
     modes = paste(modes, collapse = ";"),
-    total_trav_time = trav_time + wait_time)
+    person_trav_time = trav_time + wait_time)
 
 # Trips (SiBa + Bus)
 siba_trips <- read_output_trips(paste(path_run_siba, "/berlin-v6.4.output_trips.csv.gz", sep=""))
@@ -82,12 +82,14 @@ siba_trav_time <- siba_trips %>%
     trav_time = sum(trav_time, na.rm = TRUE),
     wait_time = sum(wait_time, na.rm = TRUE),
     modes = paste(modes, collapse = ";"),
-    total_trav_time = trav_time + wait_time)
+    person_trav_time = trav_time + wait_time)
 
-trips_joined <- base_case_trav_time %>% 
-  full_join(siba_trav_time, by=c("person"), suffix=c(".base_case", ".siba")) %>% 
-  select(person,modes.base_case,total_trav_time.base_case,modes.siba,total_trav_time.siba) %>% 
-  mutate(trav_time_diff = total_trav_time.siba - total_trav_time.base_case)
+siba_trav_time_diff <- base_case_trav_time %>% 
+  right_join(siba_trav_time, by=c("person"), suffix=c(".base_case", ".siba")) %>% 
+  select(person,person_trav_time.base_case,person_trav_time.siba) %>% 
+  mutate(trav_time_diff = person_trav_time.siba - person_trav_time.base_case)
+
+siba_trav_time_diff %>% summarise(total_trav_time_diff = sum(trav_time_diff, na.rm = TRUE)) 
 
 boxplot(trips_joined$trav_time_diff, na.rm = TRUE)
 
@@ -102,7 +104,9 @@ count_transfers <- function(mode_sequence) {
   }))
 }
 
-transfer_counts <- trips_joined %>%
+siba_transfer_diff <- base_case_trav_time %>% 
+  left_join(siba_trav_time, by=c("person"), suffix=c(".base_case", ".siba")) %>% 
+  select(person,modes.base_case,modes.siba) %>%
   mutate(
     num_transfers.base_case = map_int(modes.base_case, count_transfers),
     num_transfers.siba = map_int(modes.siba, count_transfers)
