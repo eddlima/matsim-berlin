@@ -91,7 +91,7 @@ siba_trav_time_diff <- base_case_trav_time %>%
 
 siba_trav_time_diff %>% summarise(total_trav_time_diff = sum(trav_time_diff, na.rm = TRUE)) 
 
-boxplot(trips_joined$trav_time_diff, na.rm = TRUE)
+boxplot(siba_trav_time_diff$trav_time_diff, na.rm = TRUE)
 
 # TODO: number of transfers policy case vs base case: for pt users remaining
 
@@ -107,8 +107,11 @@ count_transfers <- function(mode_sequence) {
 siba_transfer_diff <- base_case_trav_time %>% 
   left_join(siba_trav_time, by=c("person"), suffix=c(".base_case", ".siba")) %>% 
   select(person,modes.base_case,modes.siba) %>%
+  filter(!is.na(modes.siba)) %>% 
   mutate(
     num_transfers.base_case = map_int(modes.base_case, count_transfers),
     num_transfers.siba = map_int(modes.siba, count_transfers)
   ) %>% 
   mutate(transfer_diff = num_transfers.siba - num_transfers.base_case)
+
+siba_transfer_diff %>% summarise(total_transfer_diff = sum(transfer_diff, na.rm = TRUE)) 
