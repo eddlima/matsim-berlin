@@ -7,16 +7,16 @@
 #SBATCH --cpus-per-task=16
 #SBATCH --mem=64G
 #SBATCH --mail-user="e.de.almeida.lima@campus.tu-berlin.de"
-#SBATCH --job-name=SiBa_v2-10min-10pct
+#SBATCH --job-name=SiBa+v1-10min-10pct
 
 date
 hostname
 
 jar="../../app.jar"
 memory="${RUN_MEMORY:-60G}"
-config="${RUN_CONFIG:-../v6.4/berlin-v6.4-SiBa_v2.config.xml}"
+config="${RUN_CONFIG:-../v6.4/berlin-v6.4-SiBa+v1.config.xml}"
 
-arguments="--10pct --config:controller.outputDirectory ../../output-SiBa_v2-10pct"
+arguments="--10pct --config:controller.outputDirectory ../../output-SiBa+v1-10pct"
 
 # Don't change anything below
 ################
