@@ -9,12 +9,12 @@ library(writexl)
 library(sf)
 library(tmap)
 
-setwd("~/Eduardo")
+setwd("C:/Users/Eduardo Lima/Documents/TUB/Studium/Masterarbeit_git/matsim-berlin/src/main/R")
 
-path_run_base_a <- "./outputs-10pct/output-Base_Case-10pct"
-path_run_siba_a <- "./outputs-10pct/output-SiBa-10pct"
-path_run_siba_v1_a <- "./outputs-10pct/output-SiBa+v1-10pct"
-path_run_siba_v2_a <- "./outputs-10pct/output-SiBa+v2-10pct"
+path_run_base <- "../../../../outputs-10pct/output-Base_Case-10pct"
+path_run_siba <- "../../../../outputs-10pct/output-SiBa-10pct"
+path_run_siba_v1 <- "../../../../outputs-10pct/output-SiBa_v1-10pct"
+path_run_siba_v2 <- "../../../../outputs-10pct/output-SiBa_v2-10pct"
 
 # Function for transfers count
 count_transfers <- function(mode_sequence) {
@@ -27,7 +27,7 @@ count_transfers <- function(mode_sequence) {
 }
 
 # Neighborhoods
-ortsteile_shp <- st_read("./Sources/lor_ortsteile/lor_ortsteile.shp") %>% 
+ortsteile_shp <- st_read("lor_ortsteile.shp//lor_ortsteile.shp") %>% 
   st_transform(25832)
 
 neighborhoods_siba_shp <- ortsteile_shp %>% 
@@ -39,49 +39,49 @@ tm_shape(neighborhoods_siba_shp) +
 
 ### Base Case ###
 
-persons_base_case_a <- read_output_persons(paste(path_run_base_a, "/berlin-v6.4.output_persons.csv.gz", sep=""))
-trips_base_case_a <- read_output_trips(paste(path_run_base_a, "/berlin-v6.4.output_trips.csv.gz", sep=""))
-output_legs_base_case_a <- "./outputs-10pct/output-Base_Case-10pct/berlin-v6.4.output_legs.csv.gz"
-legs_base_case_a <- read_delim(gzfile(output_legs_base_case_a))
+persons_base_case <- read_output_persons(paste(path_run_base, "/berlin-v6.4.output_persons.csv.gz", sep=""))
+trips_base_case <- read_output_trips(paste(path_run_base, "/berlin-v6.4.output_trips.csv.gz", sep=""))
+output_legs_base_case <- "../../../../outputs-10pct/output-Base_Case-10pct/berlin-v6.4.output_legs.csv.gz"
+legs_base_case <- read_delim(gzfile(output_legs_base_case))
 
 # Average income
-average_income <- persons_base_case_a %>% filter(!is.na(income)) %>% summarise(average_income = mean(income))
+average_income <- persons_base_case %>% filter(!is.na(income)) %>% summarise(average_income = mean(income))
 
 # Monetized score
-base_case_a_score_monetized <- persons_base_case_a %>%
+base_case_score_monetized <- persons_base_case %>%
   filter(grepl("^(berlin|dng|bb).+", person)) %>% 
   mutate(marginal_utility_of_money = average_income$average_income / income) %>%
   mutate(score_monetized = executed_score / marginal_utility_of_money)
 
-base_case_a_total_score_monetized <- base_case_a_score_monetized %>% 
+base_case_total_score_monetized <- base_case_score_monetized %>% 
   summarise(total_score_monetized = sum(score_monetized)) * 10 # (* sample upscale factor 10)
 
-# Filtering out the agents that start or end a leg on the main neighborhoods affected by the Siemensbahn
-legs_base_case_a_sf <- legs_base_case_a  %>%
+# Filtering out the agents that start or end a trip on the main neighborhoods affected by the Siemensbahn
+trips_base_case_sf <- trips_base_case  %>%
   filter(!is.na(start_x) & !is.na(start_y) & !is.na(end_x) & !is.na(end_y)) 
 
-legs_base_case_a_start_sf <- legs_base_case_a_sf %>%
+trips_base_case_start_sf <- trips_base_case_sf %>%
   st_as_sf(coords = c("start_x","start_y"), crs = 25832) %>% 
   st_intersection(neighborhoods_siba_shp)
 
-legs_base_case_a_end_sf <- legs_base_case_a_sf %>%
+trips_base_case_end_sf <- trips_base_case_sf %>%
   st_as_sf(coords = c("end_x","end_y"), crs = 25832) %>% 
   st_intersection(neighborhoods_siba_shp)
 
-persons_base_case_a_affected_by_siba <- unique(legs_base_case_a_start_sf$person,legs_base_case_a_end_sf$person)
+persons_base_case_affected_by_siba <- unique(trips_base_case_start_sf$person,trips_base_case_end_sf$person)
 
 # Monetized score for agents affected by SiBa
-base_case_a_score_monetized_affected_by_siba <- persons_base_case_a %>%
-  filter(person %in% persons_base_case_a_affected_by_siba) %>%
+base_case_score_monetized_affected_by_siba <- persons_base_case %>%
+  filter(person %in% persons_base_case_affected_by_siba) %>%
   filter(!is.na(income)) %>% 
   mutate(marginal_utility_of_money = average_income$average_income / income) %>%
   mutate(score_monetized = executed_score / marginal_utility_of_money)
 
-base_case_a_total_score_monetized_affected_by_siba <- base_case_a_score_monetized_affected_by_siba %>% 
+base_case_total_score_monetized_affected_by_siba <- base_case_score_monetized_affected_by_siba %>% 
   summarise(total_score_monetized = sum(score_monetized)) * 10 # (* sample upscale factor 10)
 
 # Travel time
-base_case_a_trav_time <- trips_base_case_a %>% 
+base_case_trav_time <- trips_base_case %>% 
   filter(
     grepl("^(berlin|dng|bb).+", person), 
     main_mode == "pt") %>% 
@@ -92,81 +92,93 @@ base_case_a_trav_time <- trips_base_case_a %>%
     modes = paste(modes, collapse = ";"),
     person_trav_time = trav_time + wait_time)
 
-base_case_a_total_trav_time <- base_case_a_trav_time %>% 
-  summarise(total_trav_time = sum(person_trav_time)) / 3600 
+base_case_total_trav_time <- base_case_trav_time %>% 
+  summarise(total_trav_time = sum(person_trav_time)) / 3600
+
+# Car trips
+base_case_car_trips <- trips_base_case %>%
+  filter(
+    grepl("^(berlin|dng|bb).+", person),
+    main_mode == "car")
+
+# PT trips
+base_case_pt_trips <- trips_base_case %>%
+  filter(
+    grepl("^(berlin|dng|bb).+", person),
+    main_mode == "pt")
 
 # Transfers
-base_case_a_transfers <- base_case_a_trav_time %>%
+base_case_transfers <- base_case_trav_time %>%
   select(person,modes) %>%
   filter(!is.na(modes)) %>%
   mutate(num_transfers = map_int(modes, count_transfers))
 
-base_case_a_total_transfers <- base_case_a_transfers %>% 
+base_case_total_transfers <- base_case_transfers %>% 
   summarise(total_transfers = sum(num_transfers, na.rm = TRUE))
 
 # Car-km
-base_case_a_car_km <- legs_base_case_a %>% 
+base_case_car_km <- trips_base_case %>% 
   filter(
     grepl("^(berlin|dng|bb).+", person),
-    mode == "car") %>% 
+    main_mode == "car") %>% 
   group_by(person) %>%
-  summarise(person_car_km = sum(distance) / 1000)
+  summarise(person_car_km = sum(traveled_distance) / 1000)
 
-base_case_a_total_car_km <- base_case_a_car_km %>% 
+base_case_total_car_km <- base_case_car_km %>% 
   summarise(total_car_km = sum(person_car_km))
 
 # Results
-base_case_a_results <- data.frame(
+base_case_results <- data.frame(
   Scenario = "Base Case",
-  'Total Monetized Score [EUR/day]' = as.numeric(base_case_a_total_score_monetized),
-  'Total Monetized Score Delimited Region [EUR/day]' = as.numeric(base_case_a_total_score_monetized_affected_by_siba),
-  'Total Travel Time for PT-Users [h/day]' = as.numeric(base_case_a_total_trav_time),
-  'Total Transfers [1/day]' =  as.numeric(base_case_a_total_transfers),
-  'Total Car-km [km/day]' = as.numeric(base_case_a_total_car_km),
+  'Total Monetized Score [EUR/day]' = as.numeric(base_case_total_score_monetized),
+  'Total Monetized Score Delimited Region [EUR/day]' = as.numeric(base_case_total_score_monetized_affected_by_siba),
+  'Total Travel Time for PT-Users [h/day]' = as.numeric(base_case_total_trav_time),
+  'Total Transfers [1/day]' =  as.numeric(base_case_total_transfers),
+  'Total Car-km [km/day]' = as.numeric(base_case_total_car_km),
   check.names = FALSE)
 
 ### Siemensbahn ###
 
-persons_siba_a <- read_output_persons(paste(path_run_siba_a, "/berlin-v6.4.output_persons.csv.gz", sep=""))
-trips_siba_a <- read_output_trips(paste(path_run_siba_a, "/berlin-v6.4.output_trips.csv.gz", sep=""))
-output_legs_siba_a <- "./outputs-10pct/output-SiBa-10pct/berlin-v6.4.output_legs.csv.gz"
-legs_siba_a <- read_delim(gzfile(output_legs_siba_a))
+persons_siba <- read_output_persons(paste(path_run_siba, "/berlin-v6.4.output_persons.csv.gz", sep=""))
+trips_siba <- read_output_trips(paste(path_run_siba, "/berlin-v6.4.output_trips.csv.gz", sep=""))
+output_legs_siba <- "../../../../outputs-10pct/output-SiBa-10pct/berlin-v6.4.output_legs.csv.gz"
+legs_siba <- read_delim(gzfile(output_legs_siba))
 
 # Monetized score
-siba_a_score_monetized <- persons_siba_a %>%
+siba_score_monetized <- persons_siba %>%
   filter(grepl("^(berlin|dng|bb).+", person)) %>% 
   mutate(marginal_utility_of_money = average_income$average_income / income) %>%
   mutate(score_monetized = executed_score / marginal_utility_of_money)
 
-siba_a_total_score_monetized <- siba_a_score_monetized %>% 
+siba_total_score_monetized <- siba_score_monetized %>% 
   summarise(total_score_monetized = sum(score_monetized)) * 10 # (* sample upscale factor 10)
 
-# Filtering out the agents that start or end a leg on the main neighborhoods affected by the Siemensbahn
-legs_siba_a_sf <- legs_siba_a  %>%
+# Filtering out the agents that start or end a trip on the main neighborhoods affected by the Siemensbahn
+trips_siba_sf <- trips_siba  %>%
   filter(!is.na(start_x) & !is.na(start_y) & !is.na(end_x) & !is.na(end_y)) 
 
-legs_siba_a_start_sf <- legs_siba_a_sf %>%
+trips_siba_start_sf <- trips_siba_sf %>%
   st_as_sf(coords = c("start_x","start_y"), crs = 25832) %>% 
   st_intersection(neighborhoods_siba_shp)
 
-legs_siba_a_end_sf <- legs_siba_a_sf %>%
+trips_siba_end_sf <- trips_siba_sf %>%
   st_as_sf(coords = c("end_x","end_y"), crs = 25832) %>% 
   st_intersection(neighborhoods_siba_shp)
 
-persons_siba_a_affected_by_siba <- unique(legs_siba_a_start_sf$person,legs_siba_a_end_sf$person)
+persons_siba_affected_by_siba <- unique(trips_siba_start_sf$person,trips_siba_end_sf$person)
 
 # Monetized score for agents affected by SiBa
-siba_a_score_monetized_affected_by_siba <- persons_siba_a %>%
-  filter(person %in% persons_siba_a_affected_by_siba) %>%
+siba_score_monetized_affected_by_siba <- persons_siba %>%
+  filter(person %in% persons_siba_affected_by_siba) %>%
   filter(!is.na(income)) %>% 
   mutate(marginal_utility_of_money = average_income$average_income / income) %>%
   mutate(score_monetized = executed_score / marginal_utility_of_money)
 
-siba_a_total_score_monetized_affected_by_siba <- siba_a_score_monetized_affected_by_siba %>% 
+siba_total_score_monetized_affected_by_siba <- siba_score_monetized_affected_by_siba %>% 
   summarise(total_score_monetized = sum(score_monetized)) * 10 # (* sample upscale factor 10)
 
 # Travel time 
-siba_a_trav_time <- trips_siba_a %>% 
+siba_trav_time <- trips_siba %>% 
   filter(
     grepl("^(berlin|dng|bb).+", person), 
     main_mode == "pt") %>% 
@@ -177,81 +189,87 @@ siba_a_trav_time <- trips_siba_a %>%
     modes = paste(modes, collapse = ";"),
     person_trav_time = trav_time + wait_time)
 
-siba_a_total_trav_time <- siba_a_trav_time %>% 
+siba_total_trav_time <- siba_trav_time %>% 
   summarise(total_trav_time = sum(person_trav_time)) / 3600 
 
+# PT trips
+siba_pt_trips <- trips_siba %>%
+  filter(
+    grepl("^(berlin|dng|bb).+", person),
+    main_mode == "pt")
+
 # Transfers
-siba_a_transfers <- siba_a_trav_time %>%
+siba_transfers <- siba_trav_time %>%
   select(person,modes) %>%
   filter(!is.na(modes)) %>%
   mutate(num_transfers = map_int(modes, count_transfers))
 
-siba_a_total_transfers <- siba_a_transfers %>% 
+siba_total_transfers <- siba_transfers %>% 
   summarise(total_transfers = sum(num_transfers, na.rm = TRUE))
 
 # Car-km
-siba_a_car_km <- legs_siba_a %>% 
+siba_car_km <- trips_siba %>% 
   filter(
     grepl("^(berlin|dng|bb).+", person),
-    mode == "car") %>% 
+    main_mode == "car") %>% 
   group_by(person) %>%
-  summarise(person_car_km = sum(distance) / 1000)
+  summarise(person_car_km = sum(traveled_distance) / 1000)
 
-siba_a_total_car_km <- siba_a_car_km %>% 
+siba_total_car_km <- siba_car_km %>% 
   summarise(total_car_km = sum(person_car_km))
 
 # Results
-siba_a_results <- data.frame(
+siba_results <- data.frame(
   Scenario = "Siemensbahn",
-  'Total Monetized Score [EUR/day]' = as.numeric(siba_a_total_score_monetized),
-  'Total Monetized Score Delimited Region [EUR/day]' = as.numeric(siba_a_total_score_monetized_affected_by_siba),
-  'Total Travel Time for PT-Users [h/day]' = as.numeric(siba_a_total_trav_time),
-  'Total Transfers [1/day]' =  as.numeric(siba_a_total_transfers),
-  'Total Car-km [km/day]' = as.numeric(siba_a_total_car_km),
+  'Total Monetized Score [EUR/day]' = as.numeric(siba_total_score_monetized),
+  'Total Monetized Score Delimited Region [EUR/day]' = as.numeric(siba_total_score_monetized_affected_by_siba),
+  'Total Travel Time for PT-Users [h/day]' = as.numeric(siba_total_trav_time),
+  'Total Transfers [1/day]' =  as.numeric(siba_total_transfers),
+  'Total Car-km [km/day]' = as.numeric(siba_total_car_km),
   check.names = FALSE)
 
 ### Siemensbahn+v1 ###
 
-persons_siba_v1_a <- read_output_persons(paste(path_run_siba_v1_a, "/berlin-v6.4.output_persons.csv.gz", sep=""))
-trips_siba_v1_a <- read_output_trips(paste(path_run_siba_v1_a, "/berlin-v6.4.output_trips.csv.gz", sep=""))
-output_legs_siba_v1_a <- "./outputs-10pct/output-SiBa+v1-10pct/berlin-v6.4.output_legs.csv.gz"
-legs_siba_v1_a <- read_delim(gzfile(output_legs_siba_v1_a))
+persons_siba_v1 <- read_output_persons(paste(path_run_siba_v1, "/berlin-v6.4.output_persons.csv.gz", sep=""))
+trips_siba_v1 <- read_output_trips(paste(path_run_siba_v1, "/berlin-v6.4.output_trips.csv.gz", sep=""))
+output_legs_siba_v1 <- "../../../../outputs-10pct/output-SiBa+v1-10pct/berlin-v6.4.output_legs.csv.gz"
+legs_siba_v1 <- read_delim(gzfile(output_legs_siba_v1))
 
 # Monetized score
-siba_v1_a_score_monetized <- persons_siba_v1_a %>%
+siba_v1_score_monetized <- persons_siba_v1 %>%
   filter(grepl("^(berlin|dng|bb).+", person)) %>%
   mutate(marginal_utility_of_money = average_income$average_income / income) %>%
   mutate(score_monetized = executed_score / marginal_utility_of_money)
 
-siba_v1_a_total_score_monetized <- siba_v1_a_score_monetized %>%
+siba_v1_total_score_monetized <- siba_v1_score_monetized %>%
   summarise(total_score_monetized = sum(score_monetized)) * 10 # (* sample upscale factor 10)
 
-# Filtering out the agents that start or end a leg on the main neighborhoods affected by the Siemensbahn
-legs_siba_v1_a_sf <- legs_siba_v1_a  %>%
+# Filtering out the agents that start or end a trip on the main neighborhoods affected by the Siemensbahn
+trips_siba_v1_sf <- trips_siba_v1  %>%
   filter(!is.na(start_x) & !is.na(start_y) & !is.na(end_x) & !is.na(end_y)) 
 
-legs_siba_v1_a_start_sf <- legs_siba_v1_a_sf %>%
+trips_siba_v1_start_sf <- trips_siba_v1_sf %>%
   st_as_sf(coords = c("start_x","start_y"), crs = 25832) %>% 
   st_intersection(neighborhoods_siba_shp)
 
-legs_siba_v1_a_end_sf <- legs_siba_v1_a_sf %>%
+trips_siba_v1_end_sf <- trips_siba_v1_sf %>%
   st_as_sf(coords = c("end_x","end_y"), crs = 25832) %>% 
   st_intersection(neighborhoods_siba_shp)
 
-persons_siba_v1_a_affected_by_siba <- unique(legs_siba_v1_a_start_sf$person,legs_siba_v1_a_end_sf$person)
+persons_siba_v1_affected_by_siba <- unique(trips_siba_v1_start_sf$person,trips_siba_v1_end_sf$person)
 
 # Monetized score for agents affected by SiBa+v1
-siba_v1_a_score_monetized_affected_by_siba <- persons_siba_v1_a %>%
-  filter(person %in% persons_siba_v1_a_affected_by_siba) %>%
+siba_v1_score_monetized_affected_by_siba <- persons_siba_v1 %>%
+  filter(person %in% persons_siba_v1_affected_by_siba) %>%
   filter(!is.na(income)) %>% 
   mutate(marginal_utility_of_money = average_income$average_income / income) %>%
   mutate(score_monetized = executed_score / marginal_utility_of_money)
 
-siba_v1_a_total_score_monetized_affected_by_siba <- siba_v1_a_score_monetized_affected_by_siba %>% 
+siba_v1_total_score_monetized_affected_by_siba <- siba_v1_score_monetized_affected_by_siba %>% 
   summarise(total_score_monetized = sum(score_monetized)) * 10 # (* sample upscale factor 10)
 
 # Travel time
-siba_v1_a_trav_time <- trips_siba_v1_a %>%
+siba_v1_trav_time <- trips_siba_v1 %>%
   filter(
     grepl("^(berlin|dng|bb).+", person),
     main_mode == "pt") %>%
@@ -262,81 +280,87 @@ siba_v1_a_trav_time <- trips_siba_v1_a %>%
     modes = paste(modes, collapse = ";"),
     person_trav_time = trav_time + wait_time)
 
-siba_v1_a_total_trav_time <- siba_v1_a_trav_time %>%
+siba_v1_total_trav_time <- siba_v1_trav_time %>%
   summarise(total_trav_time = sum(person_trav_time)) / 3600
 
+# PT trips
+siba_v1_pt_trips <- trips_siba_v1 %>%
+  filter(
+    grepl("^(berlin|dng|bb).+", person),
+    main_mode == "pt")
+
 # Transfers
-siba_v1_a_transfers <- siba_v1_a_trav_time %>%
+siba_v1_transfers <- siba_v1_trav_time %>%
   select(person,modes) %>%
   filter(!is.na(modes)) %>%
   mutate(num_transfers = map_int(modes, count_transfers))
 
-siba_v1_a_total_transfers <- siba_v1_a_transfers %>%
+siba_v1_total_transfers <- siba_v1_transfers %>%
   summarise(total_transfers = sum(num_transfers, na.rm = TRUE))
 
 # Car-km
-siba_v1_a_car_km <- legs_siba_v1_a %>%
+siba_v1_car_km <- trips_siba_v1 %>%
   filter(
     grepl("^(berlin|dng|bb).+", person),
-    mode == "car") %>%
+    main_mode == "car") %>%
   group_by(person) %>%
-  summarise(person_car_km = sum(distance) / 1000)
+  summarise(person_car_km = sum(traveled_distance) / 1000)
 
-siba_v1_a_total_car_km <- siba_v1_a_car_km %>%
+siba_v1_total_car_km <- siba_v1_car_km %>%
   summarise(total_car_km = sum(person_car_km))
 
 # Results
-siba_v1_a_results <- data.frame(
+siba_v1_results <- data.frame(
   Scenario = "Siemensbahn+v1",
-  'Total Monetized Score [EUR/day]' = as.numeric(siba_v1_a_total_score_monetized),
-  'Total Monetized Score Delimited Region [EUR/day]' = as.numeric(siba_v1_a_total_score_monetized_affected_by_siba),
-  'Total Travel Time for PT-Users [h/day]' = as.numeric(siba_v1_a_total_trav_time),
-  'Total Transfers [1/day]' =  as.numeric(siba_v1_a_total_transfers),
-  'Total Car-km [km/day]' = as.numeric(siba_v1_a_total_car_km),
+  'Total Monetized Score [EUR/day]' = as.numeric(siba_v1_total_score_monetized),
+  'Total Monetized Score Delimited Region [EUR/day]' = as.numeric(siba_v1_total_score_monetized_affected_by_siba),
+  'Total Travel Time for PT-Users [h/day]' = as.numeric(siba_v1_total_trav_time),
+  'Total Transfers [1/day]' =  as.numeric(siba_v1_total_transfers),
+  'Total Car-km [km/day]' = as.numeric(siba_v1_total_car_km),
   check.names = FALSE)
 
 ### Siemensbahn+v2 ###
 
-persons_siba_v2_a <- read_output_persons(paste(path_run_siba_v2_a, "/berlin-v6.4.output_persons.csv.gz", sep=""))
-trips_siba_v2_a <- read_output_trips(paste(path_run_siba_v2_a, "/berlin-v6.4.output_trips.csv.gz", sep=""))
-output_legs_siba_v2_a <- "./outputs-10pct/output-SiBa+v2-10pct/berlin-v6.4.output_legs.csv.gz"
-legs_siba_v2_a <- read_delim(gzfile(output_legs_siba_v2_a))
+persons_siba_v2 <- read_output_persons(paste(path_run_siba_v2, "/berlin-v6.4.output_persons.csv.gz", sep=""))
+trips_siba_v2 <- read_output_trips(paste(path_run_siba_v2, "/berlin-v6.4.output_trips.csv.gz", sep=""))
+output_legs_siba_v2 <- "../../../../outputs-10pct/output-SiBa+v2-10pct/berlin-v6.4.output_legs.csv.gz"
+legs_siba_v2 <- read_delim(gzfile(output_legs_siba_v2))
 
 # Monetized score
-siba_v2_a_score_monetized <- persons_siba_v2_a %>%
+siba_v2_score_monetized <- persons_siba_v2 %>%
   filter(grepl("^(berlin|dng|bb).+", person)) %>%
   mutate(marginal_utility_of_money = average_income$average_income / income) %>%
   mutate(score_monetized = executed_score / marginal_utility_of_money)
 
-siba_v2_a_total_score_monetized <- siba_v2_a_score_monetized %>%
+siba_v2_total_score_monetized <- siba_v2_score_monetized %>%
   summarise(total_score_monetized = sum(score_monetized)) * 10 # (* sample upscale factor 10)
 
-# Filtering out the agents that start or end a leg on the main neighborhoods affected by the Siemensbahn
-legs_siba_v2_a_sf <- legs_siba_v2_a  %>%
+# Filtering out the agents that start or end a trip on the main neighborhoods affected by the Siemensbahn
+trips_siba_v2_sf <- trips_siba_v2  %>%
   filter(!is.na(start_x) & !is.na(start_y) & !is.na(end_x) & !is.na(end_y)) 
 
-legs_siba_v2_a_start_sf <- legs_siba_v2_a_sf %>%
+trips_siba_v2_start_sf <- trips_siba_v2_sf %>%
   st_as_sf(coords = c("start_x","start_y"), crs = 25832) %>% 
   st_intersection(neighborhoods_siba_shp)
 
-legs_siba_v2_a_end_sf <- legs_siba_v2_a_sf %>%
+trips_siba_v2_end_sf <- trips_siba_v2_sf %>%
   st_as_sf(coords = c("end_x","end_y"), crs = 25832) %>% 
   st_intersection(neighborhoods_siba_shp)
 
-persons_siba_v2_a_affected_by_siba <- unique(legs_siba_v2_a_start_sf$person,legs_siba_v2_a_end_sf$person)
+persons_siba_v2_affected_by_siba <- unique(trips_siba_v2_start_sf$person,trips_siba_v2_end_sf$person)
 
 # Monetized score for agents affected by SiBa+v2
-siba_v2_a_score_monetized_affected_by_siba <- persons_siba_v2_a %>%
-  filter(person %in% persons_siba_v2_a_affected_by_siba) %>%
+siba_v2_score_monetized_affected_by_siba <- persons_siba_v2 %>%
+  filter(person %in% persons_siba_v2_affected_by_siba) %>%
   filter(!is.na(income)) %>% 
   mutate(marginal_utility_of_money = average_income$average_income / income) %>%
   mutate(score_monetized = executed_score / marginal_utility_of_money)
 
-siba_v2_a_total_score_monetized_affected_by_siba <- siba_v2_a_score_monetized_affected_by_siba %>% 
+siba_v2_total_score_monetized_affected_by_siba <- siba_v2_score_monetized_affected_by_siba %>% 
   summarise(total_score_monetized = sum(score_monetized)) * 10 # (* sample upscale factor 10)
 
 # Travel time
-siba_v2_a_trav_time <- trips_siba_v2_a %>%
+siba_v2_trav_time <- trips_siba_v2 %>%
   filter(
     grepl("^(berlin|dng|bb).+", person),
     main_mode == "pt") %>%
@@ -347,113 +371,99 @@ siba_v2_a_trav_time <- trips_siba_v2_a %>%
     modes = paste(modes, collapse = ";"),
     person_trav_time = trav_time + wait_time)
 
-siba_v2_a_total_trav_time <- siba_v2_a_trav_time %>%
+siba_v2_total_trav_time <- siba_v2_trav_time %>%
   summarise(total_trav_time = sum(person_trav_time)) / 3600
 
+# PT trips
+siba_v2_pt_trips <- trips_siba_v2 %>%
+  filter(
+    grepl("^(berlin|dng|bb).+", person),
+    main_mode == "pt")
+
 # Transfers
-siba_v2_a_transfers <- siba_v2_a_trav_time %>%
+siba_v2_transfers <- siba_v2_trav_time %>%
   select(person,modes) %>%
   filter(!is.na(modes)) %>%
   mutate(num_transfers = map_int(modes, count_transfers))
 
-siba_v2_a_total_transfers <- siba_v2_a_transfers %>%
+siba_v2_total_transfers <- siba_v2_transfers %>%
   summarise(total_transfers = sum(num_transfers, na.rm = TRUE))
 
 # Car-km
-siba_v2_a_car_km <- legs_siba_v2_a %>%
+siba_v2_car_km <- trips_siba_v2 %>%
   filter(
     grepl("^(berlin|dng|bb).+", person),
-    mode == "car") %>%
+    main_mode == "car") %>%
   group_by(person) %>%
-  summarise(person_car_km = sum(distance) / 1000)
+  summarise(person_car_km = sum(traveled_distance) / 1000)
 
-siba_v2_a_total_car_km <- siba_v2_a_car_km %>%
+siba_v2_total_car_km <- siba_v2_car_km %>%
   summarise(total_car_km = sum(person_car_km))
 
 # Results
-siba_v2_a_results <- data.frame(
+siba_v2_results <- data.frame(
   Scenario = "Siemensbahn+v2",
-  'Total Monetized Score [EUR/day]' = as.numeric(siba_v2_a_total_score_monetized),
-  'Total Monetized Score Delimited Region [EUR/day]' = as.numeric(siba_v2_a_total_score_monetized_affected_by_siba),
-  'Total Travel Time for PT-Users [h/day]' = as.numeric(siba_v2_a_total_trav_time),
-  'Total Transfers [1/day]' =  as.numeric(siba_v2_a_total_transfers),
-  'Total Car-km [km/day]' = as.numeric(siba_v2_a_total_car_km),
+  'Total Monetized Score [EUR/day]' = as.numeric(siba_v2_total_score_monetized),
+  'Total Monetized Score Delimited Region [EUR/day]' = as.numeric(siba_v2_total_score_monetized_affected_by_siba),
+  'Total Travel Time for PT-Users [h/day]' = as.numeric(siba_v2_total_trav_time),
+  'Total Transfers [1/day]' =  as.numeric(siba_v2_total_transfers),
+  'Total Car-km [km/day]' = as.numeric(siba_v2_total_car_km),
   check.names = FALSE)
 
 ### Total Results ###
 
 results <- bind_rows(
-  base_case_a_results, 
-  siba_a_results,
-  siba_v1_a_results,
-  siba_v2_a_results
+  base_case_results, 
+  siba_results,
+  #siba_v1_results,
+  #siba_v2_results
 )
 
 write_xlsx(results, "results-analysis_Siemensbahn.xlsx")
 
 ### Comparison ###
 
-# Agents switching to pt, [Siemensbahn] vs [Base Case] - Total travel time in pt in [Siemensbahn] for former car users in [Base Case] in [hours]
-base_case_a_car_users <- unique(base_case_a_car_km$person)
+# Agents switching to pt, [Siemensbahn] vs [Base Case] - Total travel time for former car users in [Base Case] in pt in [Siemensbahn] in [hours]
+siba_base_case_switching_pt <- base_case_car_trips %>% 
+  inner_join(siba_pt_trips, by=c("person", "trip_id"), suffix=c(".base_case", ".siba")) %>% 
+  select(person,trip_id,trav_time.base_case,wait_time.base_case,traveled_distance.base_case,main_mode.base_case,trav_time.siba,wait_time.siba,traveled_distance.siba,main_mode.siba)
 
-siba_a_former_car_users <- trips_siba_a %>% 
-  filter(person %in% base_case_a_car_users) %>% 
-  filter(main_mode == "pt")
-
-siba_a_new_pt_users <- unique(siba_a_former_car_users$person)
-
-base_case_a_car_km_new_pt_users <- base_case_a_car_km %>% 
-  filter(person %in% siba_a_new_pt_users)
-
-base_case_a_siba_a_total_car_km_new_pt_users <- base_case_a_car_km_new_pt_users %>% 
-  summarise(total_car_km_new_pt_users = sum(person_car_km))
-
-siba_a_former_car_users_trav_time_pt <- siba_a_former_car_users %>%
+siba_base_case_total_trav_time_switching_pt <- siba_base_case_switching_pt %>%   
   group_by(person) %>%
   summarise(
-    trav_time = sum(trav_time, na.rm = TRUE),
-    wait_time = sum(wait_time, na.rm = TRUE),
-    person_trav_time = trav_time + wait_time)
-  
-siba_a_former_car_users_total_trav_time_pt <- siba_a_former_car_users_trav_time_pt %>% 
-  summarise(total_trav_time = sum(person_trav_time)) / 3600 # (results may show [secs], but it's [hours]!!)
+    trav_time.base_case = sum(trav_time.base_case, na.rm = TRUE),
+    wait_time.base_case = sum(wait_time.base_case, na.rm = TRUE),
+    person_trav_time.base_case = trav_time.base_case + wait_time.base_case,
+    trav_time.siba = sum(trav_time.siba, na.rm = TRUE),
+    wait_time.siba = sum(wait_time.siba, na.rm = TRUE),
+    person_trav_time.siba = trav_time.siba + wait_time.siba) %>% 
+  summarise(total_car_trav_time.base_case = sum(person_trav_time.base_case) / 3600,
+            total_pt_trav_time.siba = sum(person_trav_time.siba) / 3600) # (results may show [secs], but it's [hours]!!)
+
+# Agents switching to pt, [Siemensbahn] vs [Base Case] - Total car-km in [Base Case] for new pt-users in [Siemensbahn] in [km]
+siba_base_case_former_car_km <- siba_base_case_switching_pt %>% 
+  summarise(total_car_km.base_case = sum(traveled_distance.base_case) / 1000)
 
 # Agents remaining in pt, [Siemensbahn] vs [Base Case] - Total travel time in pt for remaining pt users in [Siemensbahn] in [hours]
-base_case_a_pt_users <- unique(base_case_a_trav_time$person)
+siba_base_case_remaining_pt <- base_case_pt_trips %>% 
+  inner_join(siba_pt_trips, by=c("person", "trip_id"), suffix=c(".base_case", ".siba")) %>% 
+  select(person,trip_id,trav_time.base_case,wait_time.base_case,traveled_distance.base_case,main_mode.base_case,trav_time.siba,wait_time.siba,traveled_distance.siba,main_mode.siba)
 
-siba_a_remaining_pt_users <- trips_siba_a %>% 
-  filter(person %in% base_case_a_pt_users) %>% 
-  filter(main_mode == "pt")
-
-siba_a_remaining_pt_users_trav_time_pt <- siba_a_remaining_pt_users %>% 
+siba_base_case_total_trav_time_remaining_pt <- siba_base_case_remaining_pt %>%   
   group_by(person) %>%
   summarise(
-    trav_time = sum(trav_time, na.rm = TRUE),
-    wait_time = sum(wait_time, na.rm = TRUE),
-    person_trav_time = trav_time + wait_time)
+    trav_time.base_case = sum(trav_time.base_case, na.rm = TRUE),
+    wait_time.base_case = sum(wait_time.base_case, na.rm = TRUE),
+    person_trav_time.base_case = trav_time.base_case + wait_time.base_case,
+    trav_time.siba = sum(trav_time.siba, na.rm = TRUE),
+    wait_time.siba = sum(wait_time.siba, na.rm = TRUE),
+    person_trav_time.siba = trav_time.siba + wait_time.siba) %>% 
+  summarise(total_pt_trav_time.base_case = sum(person_trav_time.base_case) / 3600,
+            total_pt_trav_time.siba = sum(person_trav_time.siba) / 3600) # (results may show [secs], but it's [hours]!!)
 
-siba_a_remaining_pt_users_total_trav_time_pt <- siba_a_remaining_pt_users_trav_time_pt %>% 
-  summarise(total_trav_time = sum(person_trav_time)) / 3600 # (results may show [secs], but it's [hours]!!)
+# Agents switching to SiBa, [Siemensbahn] vs [Base Case] - Former car users in [Base Case] using SiBa-Line in [Siemensbahn]
+siba_base_case_switching_pt_list <- unique(siba_base_case_switching_pt$person)
 
-# Agents switching to SiBa, [Siemensbahn] vs [Base Case] - Total travel time in SiBa in [Siemensbahn] for former car users in [Base Case] in [hours]
-base_case_a_car_users <- unique(base_case_a_car_km$person)
-
-siba_a_former_car_users <- legs_siba_a %>% 
-  filter(person %in% base_case_a_car_users) %>% 
+siba_base_case_switching_siba <- legs_siba %>% 
+  filter(person %in% siba_base_case_switching_pt_list) %>% 
   filter(grepl("^SiBa", transit_line, ignore.case = TRUE))
-
-siba_a_new_siba_users <- unique(siba_a_former_car_users$person)
-
-base_case_a_car_km_new_siba_users <- base_case_a_car_km %>% 
-  filter(person %in% siba_a_new_siba_users)
-
-base_case_a_siba_a_total_car_km_new_siba_users <- base_case_a_car_km_new_siba_users %>% 
-  summarise(total_car_km_new_siba_users = sum(person_car_km))
-
-# Travel time Difference [Siemensbahn] vs [Base Case]: for pt users remaining and for new pt users
-siba_a_base_case_a_trav_time_diff <- base_case_a_trav_time %>% 
-  left_join(siba_a_trav_time, by=c("person"), suffix=c(".base_case_a", ".siba_a")) %>% 
-  select(person,person_trav_time.base_case_a,person_trav_time.siba_a)
-
-siba_a_base_case_a_trav_time_diff %>% summarise(person_total_trav_time_base_case_a = sum(person_trav_time.base_case_a, na.rm = TRUE),
-                                                person_total_trav_time_siba_a = sum(person_trav_time.siba_a, na.rm = TRUE))
