@@ -98,19 +98,19 @@ base_case_total_trav_time <- base_case_trav_time %>%
 # Car trips
 base_case_car_trips <- trips_base_case %>%
   filter(
-    grepl("^(berlin|dng|bb).+", person),
+    grepl("^(berlin|dng|bb).+", trip_id),
     main_mode == "car")
 
 # PT trips
 base_case_pt_trips <- trips_base_case %>%
   filter(
-    grepl("^(berlin|dng|bb).+", person),
+    grepl("^(berlin|dng|bb).+", trip_id),
     main_mode == "pt")
 
 # Other trips (non-car, non-PT trips)
 base_case_other_modes_trips <- trips_base_case %>%
   filter(
-    grepl("^(berlin|dng|bb).+", person),
+    grepl("^(berlin|dng|bb).+", trip_id),
     main_mode != "car" & main_mode != "pt")
 
 # Transfers
@@ -125,7 +125,7 @@ base_case_total_transfers <- base_case_transfers %>%
 # Car-km
 base_case_car_km <- trips_base_case %>% 
   filter(
-    grepl("^(berlin|dng|bb).+", person),
+    grepl("^(berlin|dng|bb).+", trip_id),
     main_mode == "car") %>% 
   group_by(person) %>%
   summarise(person_car_km = sum(traveled_distance) / 1000)
@@ -201,13 +201,13 @@ siba_total_trav_time <- siba_trav_time %>%
 # PT trips
 siba_pt_trips <- trips_siba %>%
   filter(
-    grepl("^(berlin|dng|bb).+", person),
+    grepl("^(berlin|dng|bb).+", trip_id),
     main_mode == "pt")
 
 # Transfers
 siba_transfers <- trips_siba %>% 
   filter(
-    grepl("^(berlin|dng|bb).+", person), 
+    grepl("^(berlin|dng|bb).+", trip_id), 
     main_mode == "pt") %>%
   select(trip_id,modes) %>%
   filter(!is.na(modes)) %>%
@@ -219,7 +219,7 @@ siba_total_transfers <- siba_transfers %>%
 # Car-km
 siba_car_km <- trips_siba %>% 
   filter(
-    grepl("^(berlin|dng|bb).+", person),
+    grepl("^(berlin|dng|bb).+", trip_id),
     main_mode == "car") %>% 
   group_by(person) %>%
   summarise(person_car_km = sum(traveled_distance) / 1000)
@@ -439,6 +439,8 @@ siba_base_case_switching_pt <- base_case_car_trips %>%
   inner_join(siba_pt_trips, by=c("person", "trip_id"), suffix=c(".base_case", ".siba")) %>% 
   select(person,trip_id,trav_time.base_case,wait_time.base_case,traveled_distance.base_case,main_mode.base_case,trav_time.siba,wait_time.siba,traveled_distance.siba,main_mode.siba)
 
+siba_base_case_switching_pt_list <- unique(siba_base_case_switching_pt$person)
+
 siba_base_case_total_trav_time_switching_pt <- siba_base_case_switching_pt %>%   
   group_by(person) %>%
   summarise(
@@ -451,14 +453,12 @@ siba_base_case_total_trav_time_switching_pt <- siba_base_case_switching_pt %>%
   summarise(total_car_trav_time.base_case = sum(person_trav_time.base_case) / 3600,
             total_pt_trav_time.siba = sum(person_trav_time.siba) / 3600) # (results may show [secs], but it's [hours]!!)
 
-# Agents switching to pt, [Siemensbahn] vs [Base Case] - Total car-km in [Base Case] for new pt-users in [Siemensbahn] in [km]
-siba_base_case_former_car_km <- siba_base_case_switching_pt %>% 
-  summarise(total_car_km.base_case = sum(traveled_distance.base_case) / 1000)
-
 # Agents switching to pt from other modes, [Siemensbahn] vs [Base Case] - Total travel time for non-car and non-pt users in [Base Case] in pt in [Siemensbahn] in [hours]
 siba_base_case_switching_pt_from_other_modes <- base_case_other_modes_trips %>% 
   inner_join(siba_pt_trips, by=c("person", "trip_id"), suffix=c(".base_case", ".siba")) %>% 
   select(person,trip_id,trav_time.base_case,wait_time.base_case,traveled_distance.base_case,main_mode.base_case,trav_time.siba,wait_time.siba,traveled_distance.siba,main_mode.siba)
+
+siba_base_case_switching_pt_from_other_modes_list <- unique(siba_base_case_switching_pt_from_other_modes$person)
 
 siba_base_case_total_trav_time_switching_pt_from_other_modes <- siba_base_case_switching_pt_from_other_modes %>%   
   group_by(person) %>%
@@ -490,8 +490,6 @@ siba_base_case_total_trav_time_remaining_pt <- siba_base_case_remaining_pt %>%
             total_pt_trav_time.siba = sum(person_trav_time.siba) / 3600) # (results may show [secs], but it's [hours]!!)
 
 # Agents switching to SiBa, [Siemensbahn] vs [Base Case] - Former car users in [Base Case] using SiBa-Line in [Siemensbahn]
-siba_base_case_switching_pt_list <- unique(siba_base_case_switching_pt$person)
-
 siba_base_case_switching_siba <- legs_siba %>% 
   filter(person %in% siba_base_case_switching_pt_list) %>% 
   filter(grepl("^SiBa", transit_line, ignore.case = TRUE))
@@ -528,3 +526,52 @@ siba_base_case_total_transfers_remaining_pt <- siba_base_case_transfers_remainin
   summarise(
     total_transfers.base_case = sum(num_transfers.base_case, na.rm = TRUE),
     total_transfers.siba = sum(num_transfers.siba, na.rm = TRUE))
+
+## Car-km ##
+
+# Agents switching to pt, [Siemensbahn] vs [Base Case] - Total car-km in [Base Case] for new pt-users in [Siemensbahn] in [km]
+siba_base_case_former_car_km <- siba_base_case_switching_pt %>% 
+  summarise(total_car_km.base_case = sum(traveled_distance.base_case) / 1000)
+
+## Validation of Simulation ##
+
+# How many former car users in [Base Case] switching to pt in [Siemensbahn] do not use car anymore?
+siba_base_case_former_car_users_persons_keeping_car <- trips_siba %>% 
+  filter(
+    person %in% siba_base_case_switching_pt_list,
+    main_mode == "car") 
+
+siba_base_case_former_car_users_persons_keeping_car_list <- 
+  unique(siba_base_case_former_car_users_persons_keeping_car$person)
+
+siba_base_case_former_car_users_persons_leaving_car_list <- 
+  siba_base_case_switching_pt_list[!siba_base_case_switching_pt_list %in% 
+                                     siba_base_case_former_car_users_persons_keeping_car_list]
+
+# How many former car users in [Base Case] switching to pt in [Siemensbahn] already used pt before?
+siba_base_case_former_car_users_persons_with_pt_abo <- trips_base_case %>% 
+  filter(
+    person %in% siba_base_case_switching_pt_list,
+    main_mode == "pt") 
+
+siba_base_case_former_car_users_persons_with_pt_abo_list <- 
+  unique(siba_base_case_former_car_users_persons_with_pt_abo$person)
+
+siba_base_case_former_car_users_persons_without_pt_abo_list <- 
+  siba_base_case_switching_pt_list[!siba_base_case_switching_pt_list %in% 
+                                     siba_base_case_former_car_users_persons_with_pt_abo_list]
+
+'# How many former non-car non-pt users in [Base Case] switching to pt in [Siemensbahn] already used pt before?
+siba_base_case_former_other_modes_users_persons_with_pt_abo <- trips_base_case %>% 
+  filter(
+    person %in% siba_base_case_switching_pt_from_other_modes_list,
+    main_mode == "pt") 
+
+siba_base_case_former_other_modes_users_persons_with_pt_abo_list <- 
+  unique(siba_base_case_former_other_modes_users_persons_with_pt_abo$person)
+
+siba_base_case_former_other_modes_users_persons_without_pt_abo_list <- 
+  siba_base_case_switching_pt_list[!siba_base_case_switching_pt_from_other_modes_list %in% 
+                                     siba_base_case_former_other_modes_users_persons_with_pt_abo_list]
+
+rm(list=ls(pattern="siba_base_case_former_other_modes_users_persons"))'
