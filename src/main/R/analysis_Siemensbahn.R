@@ -12,6 +12,8 @@ library(tmap)
 setwd("C:/Users/Eduardo Lima/Documents/TUB/Studium/Masterarbeit_git/matsim-berlin/src/main/R")
 
 path_run_base <- "../../../../outputs-10pct/output-Base_Case-10pct"
+path_run_base_seed1234 <- "../../../../outputs-10pct/output-Base_Case-10pct_seed1234"
+path_run_base_seed2345 <- "../../../../outputs-10pct/output-Base_Case-10pct_seed2345"
 path_run_siba <- "../../../../outputs-10pct/output-SiBa-10pct"
 path_run_siba_v1 <- "../../../../outputs-10pct/output-SiBa+v1-10pct"
 path_run_siba_v2 <- "../../../../outputs-10pct/output-SiBa+v2-10pct"
@@ -26,7 +28,7 @@ count_transfers <- function(mode_sequence) {
   }))
 }
 
-# Neighborhoods
+# Neighborhoods - Delimited Region
 ortsteile_shp <- st_read("lor_ortsteile.shp//lor_ortsteile.shp") %>% 
   st_transform(25832)
 
@@ -44,6 +46,101 @@ trips_base_case <- read_output_trips(paste(path_run_base, "/berlin-v6.4.output_t
 output_legs_base_case <- "../../../../outputs-10pct/output-Base_Case-10pct/berlin-v6.4.output_legs.csv.gz"
 legs_base_case <- read_delim(gzfile(output_legs_base_case))
 
+# Seed 1234
+persons_base_case_seed1234 <- read_output_persons(paste(path_run_base_seed1234, "/berlin-v6.4.output_persons.csv.gz", sep=""))
+trips_base_case_seed1234 <- read_output_trips(paste(path_run_base_seed1234, "/berlin-v6.4.output_trips.csv.gz", sep=""))
+output_legs_base_case_seed1234 <- "../../../../outputs-10pct/output-Base_Case-10pct/berlin-v6.4.output_legs.csv.gz"
+legs_base_case_seed1234 <- read_delim(gzfile(output_legs_base_case_seed1234))
+
+# Seed 2345
+persons_base_case_seed2345 <- read_output_persons(paste(path_run_base_seed2345, "/berlin-v6.4.output_persons.csv.gz", sep=""))
+trips_base_case_seed2345 <- read_output_trips(paste(path_run_base_seed2345, "/berlin-v6.4.output_trips.csv.gz", sep=""))
+output_legs_base_case_seed2345 <- "../../../../outputs-10pct/output-Base_Case-10pct/berlin-v6.4.output_legs.csv.gz"
+legs_base_case_seed2345 <- read_delim(gzfile(output_legs_base_case_seed2345))
+
+# Total Score
+base_case_total_score <- persons_base_case %>% 
+  filter(grepl("^(berlin|dng|bb).+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+base_case_total_score_seed1234 <- persons_base_case_seed1234 %>% 
+  filter(grepl("^(berlin|dng|bb).+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+base_case_total_score_seed2345 <- persons_base_case_seed2345 %>% 
+  filter(grepl("^(berlin|dng|bb).+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+# Total Score for DNG-Agents
+base_case_total_score_dng <- persons_base_case %>% 
+  filter(grepl("^dng.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+base_case_total_score_seed1234_dng <- persons_base_case_seed1234 %>% 
+  filter(grepl("^dng.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+base_case_total_score_seed2345_dng <- persons_base_case_seed2345 %>% 
+  filter(grepl("^dng.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+# Total Score for Berlin-Agents
+base_case_total_score_berlin <- persons_base_case %>% 
+  filter(grepl("^berlin.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+base_case_total_score_seed1234_berlin <- persons_base_case_seed1234 %>% 
+  filter(grepl("^berlin.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+base_case_total_score_seed2345_berlin <- persons_base_case_seed2345 %>% 
+  filter(grepl("^berlin.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+# Total Score for BB-Agents
+base_case_total_score_bb <- persons_base_case %>% 
+  filter(grepl("^bb.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+base_case_total_score_seed1234_bb <- persons_base_case_seed1234 %>% 
+  filter(grepl("^bb.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+base_case_total_score_seed2345_bb <- persons_base_case_seed2345 %>% 
+  filter(grepl("^bb.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+# Total Score Results
+base_case_total_score_results <- data.frame(
+  Scenario = "Base Case",
+  'Total Score' = as.numeric(base_case_total_score),
+  'Total Score DNG-Agents' = as.numeric(base_case_total_score_dng),
+  'Total Score Berlin-Agents' = as.numeric(base_case_total_score_berlin),
+  'Total Score BB-Agents' =  as.numeric(base_case_total_score_bb),
+  check.names = FALSE)
+
+base_case_total_score_seed1234_results <- data.frame(
+  Scenario = "Base Case_seed1234",
+  'Total Score' = as.numeric(base_case_total_score_seed1234),
+  'Total Score DNG-Agents' = as.numeric(base_case_total_score_seed1234_dng),
+  'Total Score Berlin-Agents' = as.numeric(base_case_total_score_seed1234_berlin),
+  'Total Score BB-Agents' =  as.numeric(base_case_total_score_seed1234_bb),
+  check.names = FALSE)
+
+base_case_total_score_seed2345_results <- data.frame(
+  Scenario = "Base Case_seed2345",
+  'Total Score' = as.numeric(base_case_total_score_seed2345),
+  'Total Score DNG-Agents' = as.numeric(base_case_total_score_seed2345_dng),
+  'Total Score Berlin-Agents' = as.numeric(base_case_total_score_seed2345_berlin),
+  'Total Score BB-Agents' =  as.numeric(base_case_total_score_seed2345_bb),
+  check.names = FALSE)
+
+base_case_total_score_results_binded <- bind_rows(
+  base_case_total_score_results, 
+  base_case_total_score_seed1234_results,
+  base_case_total_score_seed2345_results
+)
+
 # Average income
 average_income <- persons_base_case %>% filter(!is.na(income)) %>% summarise(average_income = mean(income))
 
@@ -56,7 +153,7 @@ base_case_score_monetized <- persons_base_case %>%
 base_case_total_score_monetized <- base_case_score_monetized %>% 
   summarise(total_score_monetized = sum(score_monetized)) * 10 # (* sample upscale factor 10)
 
-# Filtering out the agents that start or end a trip on the main neighborhoods affected by the Siemensbahn
+# Filtering out the agents that start or end a trip within the Delimited Region
 trips_base_case_sf <- trips_base_case  %>%
   filter(!is.na(start_x) & !is.na(start_y) & !is.na(end_x) & !is.na(end_y)) 
 
@@ -68,16 +165,16 @@ trips_base_case_end_sf <- trips_base_case_sf %>%
   st_as_sf(coords = c("end_x","end_y"), crs = 25832) %>% 
   st_intersection(neighborhoods_siba_shp)
 
-persons_base_case_affected_by_siba <- unique(trips_base_case_start_sf$person,trips_base_case_end_sf$person)
+persons_delimited_region <- unique(trips_base_case_start_sf$person,trips_base_case_end_sf$person)
 
-# Monetized score for agents affected by SiBa
-base_case_score_monetized_affected_by_siba <- persons_base_case %>%
-  filter(person %in% persons_base_case_affected_by_siba) %>%
+# Monetized score for agents with trips starting or ending within the Delimited Region
+base_case_score_monetized_delimited_region <- persons_base_case %>%
+  filter(person %in% persons_delimited_region) %>%
   filter(!is.na(income)) %>% 
   mutate(marginal_utility_of_money = average_income$average_income / income) %>%
   mutate(score_monetized = executed_score / marginal_utility_of_money)
 
-base_case_total_score_monetized_affected_by_siba <- base_case_score_monetized_affected_by_siba %>% 
+base_case_total_score_monetized_delimited_region <- base_case_score_monetized_delimited_region %>% 
   summarise(total_score_monetized = sum(score_monetized)) * 10 # (* sample upscale factor 10)
 
 # Travel time
@@ -137,7 +234,7 @@ base_case_total_car_km <- base_case_car_km %>%
 base_case_results <- data.frame(
   Scenario = "Base Case",
   'Total Monetized Score [EUR/day]' = as.numeric(base_case_total_score_monetized),
-  'Total Monetized Score Delimited Region [EUR/day]' = as.numeric(base_case_total_score_monetized_affected_by_siba),
+  'Total Monetized Score Delimited Region [EUR/day]' = as.numeric(base_case_total_score_monetized_delimited_region),
   'Total Travel Time for PT-Users [h/day]' = as.numeric(base_case_total_trav_time),
   'Total Transfers [1/day]' =  as.numeric(base_case_total_transfers),
   'Total Car-km [km/day]' = as.numeric(base_case_total_car_km),
@@ -150,6 +247,35 @@ trips_siba <- read_output_trips(paste(path_run_siba, "/berlin-v6.4.output_trips.
 output_legs_siba <- "../../../../outputs-10pct/output-SiBa-10pct/berlin-v6.4.output_legs.csv.gz"
 legs_siba <- read_delim(gzfile(output_legs_siba))
 
+# Total Score
+siba_total_score <- persons_siba %>% 
+  filter(grepl("^(berlin|dng|bb).+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+# Total Score for DNG-Agents
+siba_total_score_dng <- persons_siba %>% 
+  filter(grepl("^dng.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+# Total Score for Berlin-Agents
+siba_total_score_berlin <- persons_siba %>% 
+  filter(grepl("^berlin.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+# Total Score for BB-Agents
+siba_total_score_bb <- persons_siba %>% 
+  filter(grepl("^bb.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+# Total Score Results
+siba_total_score_results <- data.frame(
+  Scenario = "Siemensbahn",
+  'Total Score' = as.numeric(siba_total_score),
+  'Total Score DNG-Agents' = as.numeric(siba_total_score_dng),
+  'Total Score Berlin-Agents' = as.numeric(siba_total_score_berlin),
+  'Total Score BB-Agents' =  as.numeric(siba_total_score_bb),
+  check.names = FALSE)
+
 # Monetized score
 siba_score_monetized <- persons_siba %>%
   filter(grepl("^(berlin|dng|bb).+", person)) %>% 
@@ -159,28 +285,14 @@ siba_score_monetized <- persons_siba %>%
 siba_total_score_monetized <- siba_score_monetized %>% 
   summarise(total_score_monetized = sum(score_monetized)) * 10 # (* sample upscale factor 10)
 
-# Filtering out the agents that start or end a trip on the main neighborhoods affected by the Siemensbahn
-trips_siba_sf <- trips_siba  %>%
-  filter(!is.na(start_x) & !is.na(start_y) & !is.na(end_x) & !is.na(end_y)) 
-
-trips_siba_start_sf <- trips_siba_sf %>%
-  st_as_sf(coords = c("start_x","start_y"), crs = 25832) %>% 
-  st_intersection(neighborhoods_siba_shp)
-
-trips_siba_end_sf <- trips_siba_sf %>%
-  st_as_sf(coords = c("end_x","end_y"), crs = 25832) %>% 
-  st_intersection(neighborhoods_siba_shp)
-
-persons_siba_affected_by_siba <- unique(trips_siba_start_sf$person,trips_siba_end_sf$person)
-
 # Monetized score for agents affected by SiBa
-siba_score_monetized_affected_by_siba <- persons_siba %>%
-  filter(person %in% persons_siba_affected_by_siba) %>%
+siba_score_monetized_delimited_region <- persons_siba %>%
+  filter(person %in% persons_delimited_region) %>%
   filter(!is.na(income)) %>% 
   mutate(marginal_utility_of_money = average_income$average_income / income) %>%
   mutate(score_monetized = executed_score / marginal_utility_of_money)
 
-siba_total_score_monetized_affected_by_siba <- siba_score_monetized_affected_by_siba %>% 
+siba_total_score_monetized_delimited_region <- siba_score_monetized_delimited_region %>% 
   summarise(total_score_monetized = sum(score_monetized)) * 10 # (* sample upscale factor 10)
 
 # Travel time 
@@ -231,7 +343,7 @@ siba_total_car_km <- siba_car_km %>%
 siba_results <- data.frame(
   Scenario = "Siemensbahn",
   'Total Monetized Score [EUR/day]' = as.numeric(siba_total_score_monetized),
-  'Total Monetized Score Delimited Region [EUR/day]' = as.numeric(siba_total_score_monetized_affected_by_siba),
+  'Total Monetized Score Delimited Region [EUR/day]' = as.numeric(siba_total_score_monetized_delimited_region),
   'Total Travel Time for PT-Users [h/day]' = as.numeric(siba_total_trav_time),
   'Total Transfers [1/day]' =  as.numeric(siba_total_transfers),
   'Total Car-km [km/day]' = as.numeric(siba_total_car_km),
@@ -244,6 +356,35 @@ trips_siba_v1 <- read_output_trips(paste(path_run_siba_v1, "/berlin-v6.4.output_
 output_legs_siba_v1 <- "../../../../outputs-10pct/output-SiBa+v1-10pct/berlin-v6.4.output_legs.csv.gz"
 legs_siba_v1 <- read_delim(gzfile(output_legs_siba_v1))
 
+# Total Score
+siba_v1_total_score <- persons_siba_v1 %>% 
+  filter(grepl("^(berlin|dng|bb).+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+# Total Score for DNG-Agents
+siba_v1_total_score_dng <- persons_siba_v1 %>% 
+  filter(grepl("^dng.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+# Total Score for Berlin-Agents
+siba_v1_total_score_berlin <- persons_siba_v1 %>% 
+  filter(grepl("^berlin.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+# Total Score for BB-Agents
+siba_v1_total_score_bb <- persons_siba_v1 %>% 
+  filter(grepl("^bb.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+# Total Score Results
+siba_v1_total_score_results <- data.frame(
+  Scenario = "Siemensbahn+v1",
+  'Total Score' = as.numeric(siba_v1_total_score),
+  'Total Score DNG-Agents' = as.numeric(siba_v1_total_score_dng),
+  'Total Score Berlin-Agents' = as.numeric(siba_v1_total_score_berlin),
+  'Total Score BB-Agents' =  as.numeric(siba_v1_total_score_bb),
+  check.names = FALSE)
+
 # Monetized score
 siba_v1_score_monetized <- persons_siba_v1 %>%
   filter(grepl("^(berlin|dng|bb).+", person)) %>%
@@ -253,28 +394,14 @@ siba_v1_score_monetized <- persons_siba_v1 %>%
 siba_v1_total_score_monetized <- siba_v1_score_monetized %>%
   summarise(total_score_monetized = sum(score_monetized)) * 10 # (* sample upscale factor 10)
 
-# Filtering out the agents that start or end a trip on the main neighborhoods affected by the Siemensbahn
-trips_siba_v1_sf <- trips_siba_v1  %>%
-  filter(!is.na(start_x) & !is.na(start_y) & !is.na(end_x) & !is.na(end_y)) 
-
-trips_siba_v1_start_sf <- trips_siba_v1_sf %>%
-  st_as_sf(coords = c("start_x","start_y"), crs = 25832) %>% 
-  st_intersection(neighborhoods_siba_shp)
-
-trips_siba_v1_end_sf <- trips_siba_v1_sf %>%
-  st_as_sf(coords = c("end_x","end_y"), crs = 25832) %>% 
-  st_intersection(neighborhoods_siba_shp)
-
-persons_siba_v1_affected_by_siba <- unique(trips_siba_v1_start_sf$person,trips_siba_v1_end_sf$person)
-
 # Monetized score for agents affected by SiBa+v1
-siba_v1_score_monetized_affected_by_siba <- persons_siba_v1 %>%
-  filter(person %in% persons_siba_v1_affected_by_siba) %>%
+siba_v1_score_monetized_delimited_region <- persons_siba_v1 %>%
+  filter(person %in% person_delimited_region) %>%
   filter(!is.na(income)) %>% 
   mutate(marginal_utility_of_money = average_income$average_income / income) %>%
   mutate(score_monetized = executed_score / marginal_utility_of_money)
 
-siba_v1_total_score_monetized_affected_by_siba <- siba_v1_score_monetized_affected_by_siba %>% 
+siba_v1_total_score_monetized_delimited_region <- siba_v1_score_monetized_delimited_region %>% 
   summarise(total_score_monetized = sum(score_monetized)) * 10 # (* sample upscale factor 10)
 
 # Travel time
@@ -322,7 +449,7 @@ siba_v1_total_car_km <- siba_v1_car_km %>%
 siba_v1_results <- data.frame(
   Scenario = "Siemensbahn+v1",
   'Total Monetized Score [EUR/day]' = as.numeric(siba_v1_total_score_monetized),
-  'Total Monetized Score Delimited Region [EUR/day]' = as.numeric(siba_v1_total_score_monetized_affected_by_siba),
+  'Total Monetized Score Delimited Region [EUR/day]' = as.numeric(siba_v1_total_score_monetized_delimited_region),
   'Total Travel Time for PT-Users [h/day]' = as.numeric(siba_v1_total_trav_time),
   'Total Transfers [1/day]' =  as.numeric(siba_v1_total_transfers),
   'Total Car-km [km/day]' = as.numeric(siba_v1_total_car_km),
@@ -335,6 +462,35 @@ trips_siba_v2 <- read_output_trips(paste(path_run_siba_v2, "/berlin-v6.4.output_
 output_legs_siba_v2 <- "../../../../outputs-10pct/output-SiBa+v2-10pct/berlin-v6.4.output_legs.csv.gz"
 legs_siba_v2 <- read_delim(gzfile(output_legs_siba_v2))
 
+# Total Score
+siba_v2_total_score <- persons_siba_v2 %>% 
+  filter(grepl("^(berlin|dng|bb).+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+# Total Score for DNG-Agents
+siba_v2_total_score_dng <- persons_siba_v2 %>% 
+  filter(grepl("^dng.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+# Total Score for Berlin-Agents
+siba_v2_total_score_berlin <- persons_siba_v2 %>% 
+  filter(grepl("^berlin.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+# Total Score for BB-Agents
+siba_v2_total_score_bb <- persons_siba_v2 %>% 
+  filter(grepl("^bb.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+# Total Score Results
+siba_v2_total_score_results <- data.frame(
+  Scenario = "Siemensbahn+v2",
+  'Total Score' = as.numeric(siba_v2_total_score),
+  'Total Score DNG-Agents' = as.numeric(siba_v2_total_score_dng),
+  'Total Score Berlin-Agents' = as.numeric(siba_v2_total_score_berlin),
+  'Total Score BB-Agents' =  as.numeric(siba_v2_total_score_bb),
+  check.names = FALSE)
+
 # Monetized score
 siba_v2_score_monetized <- persons_siba_v2 %>%
   filter(grepl("^(berlin|dng|bb).+", person)) %>%
@@ -344,28 +500,14 @@ siba_v2_score_monetized <- persons_siba_v2 %>%
 siba_v2_total_score_monetized <- siba_v2_score_monetized %>%
   summarise(total_score_monetized = sum(score_monetized)) * 10 # (* sample upscale factor 10)
 
-# Filtering out the agents that start or end a trip on the main neighborhoods affected by the Siemensbahn
-trips_siba_v2_sf <- trips_siba_v2  %>%
-  filter(!is.na(start_x) & !is.na(start_y) & !is.na(end_x) & !is.na(end_y)) 
-
-trips_siba_v2_start_sf <- trips_siba_v2_sf %>%
-  st_as_sf(coords = c("start_x","start_y"), crs = 25832) %>% 
-  st_intersection(neighborhoods_siba_shp)
-
-trips_siba_v2_end_sf <- trips_siba_v2_sf %>%
-  st_as_sf(coords = c("end_x","end_y"), crs = 25832) %>% 
-  st_intersection(neighborhoods_siba_shp)
-
-persons_siba_v2_affected_by_siba <- unique(trips_siba_v2_start_sf$person,trips_siba_v2_end_sf$person)
-
 # Monetized score for agents affected by SiBa+v2
-siba_v2_score_monetized_affected_by_siba <- persons_siba_v2 %>%
-  filter(person %in% persons_siba_v2_affected_by_siba) %>%
+siba_v2_score_monetized_delimited_region <- persons_siba_v2 %>%
+  filter(person %in% persons_delimited_region) %>%
   filter(!is.na(income)) %>% 
   mutate(marginal_utility_of_money = average_income$average_income / income) %>%
   mutate(score_monetized = executed_score / marginal_utility_of_money)
 
-siba_v2_total_score_monetized_affected_by_siba <- siba_v2_score_monetized_affected_by_siba %>% 
+siba_v2_total_score_monetized_delimited_region <- siba_v2_score_monetized_delimited_region %>% 
   summarise(total_score_monetized = sum(score_monetized)) * 10 # (* sample upscale factor 10)
 
 # Travel time
@@ -413,7 +555,7 @@ siba_v2_total_car_km <- siba_v2_car_km %>%
 siba_v2_results <- data.frame(
   Scenario = "Siemensbahn+v2",
   'Total Monetized Score [EUR/day]' = as.numeric(siba_v2_total_score_monetized),
-  'Total Monetized Score Delimited Region [EUR/day]' = as.numeric(siba_v2_total_score_monetized_affected_by_siba),
+  'Total Monetized Score Delimited Region [EUR/day]' = as.numeric(siba_v2_total_score_monetized_delimited_region),
   'Total Travel Time for PT-Users [h/day]' = as.numeric(siba_v2_total_trav_time),
   'Total Transfers [1/day]' =  as.numeric(siba_v2_total_transfers),
   'Total Car-km [km/day]' = as.numeric(siba_v2_total_car_km),
@@ -428,7 +570,18 @@ results <- bind_rows(
   siba_v2_results
 )
 
-write_xlsx(results, "results-analysis_Siemensbahn.xlsx")
+write_xlsx(results, "results-analysis_Siemensbahn-nach_ausiterieren.xlsx")
+
+### Total Score Results ###
+
+total_score_results_binded <- bind_rows(
+  base_case_total_score_results_binded, 
+  siba_total_score_results,
+  siba_v1_total_score_results,
+  siba_v2_total_score_results
+)
+
+write_xlsx(total_score_results_binded, "total_score_results_binded-analysis_Siemensbahn-nach_ausiterieren.xlsx")
 
 ### Comparison ###
 
@@ -575,3 +728,12 @@ siba_base_case_former_other_modes_users_persons_without_pt_abo_list <-
                                      siba_base_case_former_other_modes_users_persons_with_pt_abo_list]
 
 rm(list=ls(pattern="siba_base_case_former_other_modes_users_persons"))'
+
+## Outliers ##
+
+siba_base_case_total_score_berlin_outliers <- persons_base_case %>% 
+  full_join(persons_siba, by=c("person"), suffix=c(".base_case", ".siba")) %>% 
+  filter(grepl("^berlin.+", person)) %>%
+  select(person,executed_score.base_case,executed_score.siba) %>%
+  mutate(score_diff = executed_score.siba - executed_score.base_case) %>% 
+  filter(score_diff == max(score_diff, na.rm = TRUE) | score_diff == min(score_diff, na.rm = TRUE))
