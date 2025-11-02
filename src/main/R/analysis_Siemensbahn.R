@@ -193,6 +193,10 @@ base_case_trav_time <- base_case_pt_trips %>%
 base_case_total_trav_time <- base_case_trav_time %>% 
   summarise(total_trav_time = sum(person_trav_time)) * 10 / 3600 # (* sample upscale factor 10)
 
+# Traveled distance PT
+base_case_total_trav_distance <- base_case_pt_trips %>% 
+  summarise(total_trav_distance = sum(traveled_distance) * 10 / 1000) # (* sample upscale factor 10)
+
 # Transfers
 base_case_transfers <- base_case_pt_trips %>%
   filter(!is.na(modes)) %>%
@@ -214,6 +218,7 @@ base_case_results <- data.frame(
   Scenario = "Base Case",
   'Total Monetized Score Delimited Region [EUR/day]' = as.numeric(base_case_total_score_monetized),
   'Total Travel Time for PT-Users [h/day]' = as.numeric(base_case_total_trav_time),
+  'Total Travel Distance for PT-Users [km/day]' = as.numeric(base_case_total_trav_distance),
   'Total Transfers [1/day]' =  as.numeric(base_case_total_transfers),
   'Total Car-km [km/day]' = as.numeric(base_case_total_car_km),
   check.names = FALSE)
@@ -286,6 +291,10 @@ siba_trav_time <- siba_pt_trips %>%
 siba_total_trav_time <- siba_trav_time %>% 
   summarise(total_trav_time = sum(person_trav_time)) * 10 / 3600 # (* sample upscale factor 10) 
 
+# Traveled distance PT
+siba_total_trav_distance <- siba_pt_trips %>% 
+  summarise(total_trav_distance = sum(traveled_distance) * 10 / 1000) # (* sample upscale factor 10)
+
 # Transfers
 siba_transfers <- siba_pt_trips %>%
   select(trip_id,modes) %>%
@@ -308,6 +317,7 @@ siba_results <- data.frame(
   Scenario = "Siemensbahn",
   'Total Monetized Score Delimited Region [EUR/day]' = as.numeric(siba_total_score_monetized),
   'Total Travel Time for PT-Users [h/day]' = as.numeric(siba_total_trav_time),
+  'Total Travel Distance for PT-Users [km/day]' = as.numeric(siba_total_trav_distance),
   'Total Transfers [1/day]' =  as.numeric(siba_total_transfers),
   'Total Car-km [km/day]' = as.numeric(siba_total_car_km),
   check.names = FALSE)
@@ -380,6 +390,10 @@ siba_v1_trav_time <- siba_v1_pt_trips %>%
 siba_v1_total_trav_time <- siba_v1_trav_time %>% 
   summarise(total_trav_time = sum(person_trav_time)) * 10 / 3600 # (* sample upscale factor 10) 
 
+# Traveled distance PT
+siba_v1_total_trav_distance <- siba_v1_pt_trips %>% 
+  summarise(total_trav_distance = sum(traveled_distance) * 10 / 1000) # (* sample upscale factor 10)
+
 # Transfers
 siba_v1_transfers <- siba_v1_pt_trips %>%
   select(trip_id,modes) %>%
@@ -402,6 +416,7 @@ siba_v1_results <- data.frame(
   Scenario = "Siemensbahn+v1",
   'Total Monetized Score Delimited Region [EUR/day]' = as.numeric(siba_v1_total_score_monetized),
   'Total Travel Time for PT-Users [h/day]' = as.numeric(siba_v1_total_trav_time),
+  'Total Travel Distance for PT-Users [km/day]' = as.numeric(siba_v1_total_trav_distance),
   'Total Transfers [1/day]' =  as.numeric(siba_v1_total_transfers),
   'Total Car-km [km/day]' = as.numeric(siba_v1_total_car_km),
   check.names = FALSE)
@@ -474,6 +489,10 @@ siba_v2_trav_time <- siba_v2_pt_trips %>%
 siba_v2_total_trav_time <- siba_v2_trav_time %>% 
   summarise(total_trav_time = sum(person_trav_time)) * 10 / 3600 # (* sample upscale factor 10) 
 
+# Traveled distance PT
+siba_v2_total_trav_distance <- siba_v2_pt_trips %>% 
+  summarise(total_trav_distance = sum(traveled_distance) * 10 / 1000) # (* sample upscale factor 10)
+
 # Transfers
 siba_v2_transfers <- siba_v2_pt_trips %>%
   select(trip_id,modes) %>%
@@ -496,6 +515,7 @@ siba_v2_results <- data.frame(
   Scenario = "Siemensbahn+v2",
   'Total Monetized Score Delimited Region [EUR/day]' = as.numeric(siba_v2_total_score_monetized),
   'Total Travel Time for PT-Users [h/day]' = as.numeric(siba_v2_total_trav_time),
+  'Total Travel Distance for PT-Users [km/day]' = as.numeric(siba_v2_total_trav_distance),
   'Total Transfers [1/day]' =  as.numeric(siba_v2_total_transfers),
   'Total Car-km [km/day]' = as.numeric(siba_v2_total_car_km),
   check.names = FALSE)
