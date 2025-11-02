@@ -191,7 +191,7 @@ base_case_trav_time <- base_case_pt_trips %>%
     person_trav_time = trav_time + wait_time)
 
 base_case_total_trav_time <- base_case_trav_time %>% 
-  summarise(total_trav_time = sum(person_trav_time)) / 3600
+  summarise(total_trav_time = sum(person_trav_time)) * 10 / 3600 # (* sample upscale factor 10)
 
 # Transfers
 base_case_transfers <- base_case_pt_trips %>%
@@ -199,7 +199,7 @@ base_case_transfers <- base_case_pt_trips %>%
   mutate(num_transfers = map_int(modes, count_transfers))
 
 base_case_total_transfers <- base_case_transfers %>% 
-  summarise(total_transfers = sum(num_transfers, na.rm = TRUE))
+  summarise(total_transfers = sum(num_transfers, na.rm = TRUE)) * 10 # (* sample upscale factor 10)
 
 # Car-km
 base_case_car_km <- base_case_car_trips %>% 
@@ -207,7 +207,7 @@ base_case_car_km <- base_case_car_trips %>%
   summarise(person_car_km = sum(traveled_distance) / 1000)
 
 base_case_total_car_km <- base_case_car_km %>% 
-  summarise(total_car_km = sum(person_car_km))
+  summarise(total_car_km = sum(person_car_km)) * 10 # (* sample upscale factor 10)
 
 # Results
 base_case_results <- data.frame(
@@ -284,7 +284,7 @@ siba_trav_time <- siba_pt_trips %>%
     person_trav_time = trav_time + wait_time)
 
 siba_total_trav_time <- siba_trav_time %>% 
-  summarise(total_trav_time = sum(person_trav_time)) / 3600 
+  summarise(total_trav_time = sum(person_trav_time)) * 10 / 3600 # (* sample upscale factor 10) 
 
 # Transfers
 siba_transfers <- siba_pt_trips %>%
@@ -293,7 +293,7 @@ siba_transfers <- siba_pt_trips %>%
   mutate(num_transfers = map_int(modes, count_transfers))
 
 siba_total_transfers <- siba_transfers %>% 
-  summarise(total_transfers = sum(num_transfers, na.rm = TRUE))
+  summarise(total_transfers = sum(num_transfers, na.rm = TRUE)) * 10 # (* sample upscale factor 10)
 
 # Car-km
 siba_car_km <- siba_car_trips %>% 
@@ -301,7 +301,7 @@ siba_car_km <- siba_car_trips %>%
   summarise(person_car_km = sum(traveled_distance) / 1000)
 
 siba_total_car_km <- siba_car_km %>% 
-  summarise(total_car_km = sum(person_car_km))
+  summarise(total_car_km = sum(person_car_km)) * 10 # (* sample upscale factor 10)
 
 # Results
 siba_results <- data.frame(
@@ -378,7 +378,7 @@ siba_v1_trav_time <- siba_v1_pt_trips %>%
     person_trav_time = trav_time + wait_time)
 
 siba_v1_total_trav_time <- siba_v1_trav_time %>% 
-  summarise(total_trav_time = sum(person_trav_time)) / 3600 
+  summarise(total_trav_time = sum(person_trav_time)) * 10 / 3600 # (* sample upscale factor 10) 
 
 # Transfers
 siba_v1_transfers <- siba_v1_pt_trips %>%
@@ -387,7 +387,7 @@ siba_v1_transfers <- siba_v1_pt_trips %>%
   mutate(num_transfers = map_int(modes, count_transfers))
 
 siba_v1_total_transfers <- siba_v1_transfers %>% 
-  summarise(total_transfers = sum(num_transfers, na.rm = TRUE))
+  summarise(total_transfers = sum(num_transfers, na.rm = TRUE)) * 10 # (* sample upscale factor 10)
 
 # Car-km
 siba_v1_car_km <- siba_v1_car_trips %>% 
@@ -395,7 +395,7 @@ siba_v1_car_km <- siba_v1_car_trips %>%
   summarise(person_car_km = sum(traveled_distance) / 1000)
 
 siba_v1_total_car_km <- siba_v1_car_km %>% 
-  summarise(total_car_km = sum(person_car_km))
+  summarise(total_car_km = sum(person_car_km)) * 10 # (* sample upscale factor 10)
 
 # Results
 siba_v1_results <- data.frame(
@@ -472,7 +472,7 @@ siba_v2_trav_time <- siba_v2_pt_trips %>%
     person_trav_time = trav_time + wait_time)
 
 siba_v2_total_trav_time <- siba_v2_trav_time %>% 
-  summarise(total_trav_time = sum(person_trav_time)) / 3600 
+  summarise(total_trav_time = sum(person_trav_time)) * 10 / 3600 # (* sample upscale factor 10) 
 
 # Transfers
 siba_v2_transfers <- siba_v2_pt_trips %>%
@@ -481,7 +481,7 @@ siba_v2_transfers <- siba_v2_pt_trips %>%
   mutate(num_transfers = map_int(modes, count_transfers))
 
 siba_v2_total_transfers <- siba_v2_transfers %>% 
-  summarise(total_transfers = sum(num_transfers, na.rm = TRUE))
+  summarise(total_transfers = sum(num_transfers, na.rm = TRUE)) * 10 # (* sample upscale factor 10)
 
 # Car-km
 siba_v2_car_km <- siba_v2_car_trips %>% 
@@ -489,7 +489,7 @@ siba_v2_car_km <- siba_v2_car_trips %>%
   summarise(person_car_km = sum(traveled_distance) / 1000)
 
 siba_v2_total_car_km <- siba_v2_car_km %>% 
-  summarise(total_car_km = sum(person_car_km))
+  summarise(total_car_km = sum(person_car_km)) * 10 # (* sample upscale factor 10)
 
 # Results
 siba_v2_results <- data.frame(
@@ -542,8 +542,9 @@ siba_base_case_total_trav_time_switching_pt <- siba_base_case_switching_pt %>%
     trav_time.siba = sum(trav_time.siba, na.rm = TRUE),
     wait_time.siba = sum(wait_time.siba, na.rm = TRUE),
     person_trav_time.siba = trav_time.siba + wait_time.siba) %>% 
-  summarise(total_car_trav_time.base_case = sum(person_trav_time.base_case) / 3600,
-            total_pt_trav_time.siba = sum(person_trav_time.siba) / 3600) # (results may show [secs], but it's [hours]!!)
+  summarise(total_car_trav_time.base_case = sum(person_trav_time.base_case) * 10 / 3600,
+            total_pt_trav_time.siba = sum(person_trav_time.siba) * 10 / 3600) # (results may show [secs], but it's [hours]!!)
+                                                                              # (* sample upscale factor 10)
 
 # Agents switching to pt from other modes, [Siemensbahn] vs [Base Case] - Total travel time for non-car and non-pt users in [Base Case] in pt in [Siemensbahn] in [hours]
 siba_base_case_switching_pt_from_other_modes <- base_case_other_modes_trips %>% 
@@ -561,8 +562,9 @@ siba_base_case_total_trav_time_switching_pt_from_other_modes <- siba_base_case_s
     trav_time.siba = sum(trav_time.siba, na.rm = TRUE),
     wait_time.siba = sum(wait_time.siba, na.rm = TRUE),
     person_trav_time.siba = trav_time.siba + wait_time.siba) %>% 
-  summarise(total_other_modes_trav_time.base_case = sum(person_trav_time.base_case) / 3600,
-            total_pt_trav_time.siba = sum(person_trav_time.siba) / 3600) # (results may show [secs], but it's [hours]!!)
+  summarise(total_other_modes_trav_time.base_case = sum(person_trav_time.base_case) * 10 / 3600,
+            total_pt_trav_time.siba = sum(person_trav_time.siba) * 10 / 3600) # (results may show [secs], but it's [hours]!!)
+                                                                              # (* sample upscale factor 10)
 
 # Agents remaining in pt, [Siemensbahn] vs [Base Case] - Total travel time in pt for remaining pt users in [Siemensbahn] in [hours]
 siba_base_case_remaining_pt <- base_case_pt_trips %>% 
@@ -578,8 +580,9 @@ siba_base_case_total_trav_time_remaining_pt <- siba_base_case_remaining_pt %>%
     trav_time.siba = sum(trav_time.siba, na.rm = TRUE),
     wait_time.siba = sum(wait_time.siba, na.rm = TRUE),
     person_trav_time.siba = trav_time.siba + wait_time.siba) %>% 
-  summarise(total_pt_trav_time.base_case = sum(person_trav_time.base_case) / 3600,
-            total_pt_trav_time.siba = sum(person_trav_time.siba) / 3600) # (results may show [secs], but it's [hours]!!)
+  summarise(total_pt_trav_time.base_case = sum(person_trav_time.base_case) * 10 / 3600,
+            total_pt_trav_time.siba = sum(person_trav_time.siba) * 10 / 3600) # (results may show [secs], but it's [hours]!!)
+                                                                              # (* sample upscale factor 10)
 
 # Agents switching to SiBa, [Siemensbahn] vs [Base Case] - Former car users in [Base Case] using SiBa-Line in [Siemensbahn]
 siba_base_case_switching_siba <- legs_siba %>% 
@@ -595,7 +598,7 @@ siba_base_case_transfers_switching_pt <- base_case_car_trips %>%
   mutate(num_transfers.siba = map_int(modes.siba, count_transfers))
 
 siba_base_case_total_transfers_switching_pt <- siba_base_case_transfers_switching_pt %>% 
-  summarise(total_transfers.siba = sum(num_transfers.siba, na.rm = TRUE))
+  summarise(total_transfers.siba = sum(num_transfers.siba, na.rm = TRUE)) * 10 # (* sample upscale factor 10)
 
 # Agents switching to pt from other modes, [Siemensbahn] vs [Base Case] - Total transfers for non-car and non-pt users in [Base Case] in pt in [Siemensbahn] in [unit]
 siba_base_case_transfers_switching_pt_from_other_modes <- base_case_other_modes_trips %>% 
@@ -604,7 +607,7 @@ siba_base_case_transfers_switching_pt_from_other_modes <- base_case_other_modes_
   mutate(num_transfers.siba = map_int(modes.siba, count_transfers))
 
 siba_base_case_total_transfers_switching_pt_from_other_modes <- siba_base_case_transfers_switching_pt_from_other_modes %>% 
-  summarise(total_transfers.siba = sum(num_transfers.siba, na.rm = TRUE))
+  summarise(total_transfers.siba = sum(num_transfers.siba, na.rm = TRUE)) * 10 # (* sample upscale factor 10)
 
 # Agents remaining in pt, [Siemensbahn] vs [Base Case] - Total transfers in pt for remaining pt users in [Siemensbahn] in [unit]
 siba_base_case_transfers_remaining_pt <- base_case_pt_trips %>% 
@@ -616,14 +619,14 @@ siba_base_case_transfers_remaining_pt <- base_case_pt_trips %>%
 
 siba_base_case_total_transfers_remaining_pt <- siba_base_case_transfers_remaining_pt %>% 
   summarise(
-    total_transfers.base_case = sum(num_transfers.base_case, na.rm = TRUE),
-    total_transfers.siba = sum(num_transfers.siba, na.rm = TRUE))
+    total_transfers.base_case = sum(num_transfers.base_case, na.rm = TRUE) * 10,
+    total_transfers.siba = sum(num_transfers.siba, na.rm = TRUE) * 10 ) # (* sample upscale factor 10)
 
 ## Car-km ##
 
 # Agents switching to pt, [Siemensbahn] vs [Base Case] - Total car-km in [Base Case] for new pt-users in [Siemensbahn] in [km]
 siba_base_case_former_car_km <- siba_base_case_switching_pt %>% 
-  summarise(total_car_km.base_case = sum(traveled_distance.base_case) / 1000)
+  summarise(total_car_km.base_case = sum(traveled_distance.base_case) * 10 / 1000) # (* sample upscale factor 10)
 
 ## Validation of Simulation ##
 
