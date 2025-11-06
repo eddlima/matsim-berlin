@@ -8,6 +8,7 @@ library(tibble)
 library(writexl)
 library(sf)
 library(tmap)
+library(ggplot2)
 
 setwd("C:/Users/Eduardo Lima/Documents/TUB/Studium/Masterarbeit_git/matsim-berlin/src/main/R")
 
@@ -699,3 +700,84 @@ siba_base_case_total_score_berlin_outliers <- persons_base_case %>%
   select(person,executed_score.base_case,executed_score.siba) %>%
   mutate(score_diff = executed_score.siba - executed_score.base_case) %>% 
   filter(score_diff == max(score_diff, na.rm = TRUE) | score_diff == min(score_diff, na.rm = TRUE))
+
+## Train Capacity ##
+
+train_capacity_siba <- legs_siba %>% 
+  filter(grepl("SiBa", transit_line)) %>% 
+  mutate(hour = hour(dep_time)) %>% 
+  count(hour, transit_line, person = "passengers") %>% 
+  arrange(hour, transit_line) %>% 
+  mutate(n = n * 10) # (* sample upscale factor 10)
+
+ggplot(train_capacity_siba, aes(x = hour, y = n, fill = transit_line)) +
+  geom_col(position = "dodge") +
+  labs(
+    title = "SiBa-Line - Usage by Hour",
+    x = "Hour of Day",
+    y = "Number of Passengers",
+    fill = "Direction"
+  ) +
+  scale_fill_discrete(
+    labels = c("SiBa_e_w" = "Hauptbahnhof > Gartenfeld", "SiBa_w_e" = "Gartenfeld > Hauptbahnhof")
+    ) +
+  theme_minimal() +
+  scale_x_continuous(breaks = 0:23)
+
+## DNG Agents ##
+
+access_gartenfeld_dng_siba <- legs_siba %>% 
+  filter(grepl("SiBa", transit_line)) %>%
+  filter(grepl("^dng.+", person)) %>% 
+  filter(access_stop_id == "Gartenfeld_e_w" | access_stop_id == "Gartenfeld_w_e")
+
+trip_id_access_gartenfeld_dng_siba <- unique(access_gartenfeld_dng_siba$trip_id)
+
+walk_mode_to_gartenfeld_dng_siba <- legs_siba %>% 
+  filter(trip_id %in% trip_id_access_gartenfeld_dng_siba) %>% 
+  filter(mode == "walk" & end_link == "pt_116440_SuburbanRailway")
+
+egress_gartenfeld_dng_siba <- legs_siba %>% 
+  filter(grepl("SiBa", transit_line)) %>%
+  filter(grepl("^dng.+", person)) %>% 
+  filter(egress_stop_id == "Gartenfeld_e_w" | egress_stop_id == "Gartenfeld_w_e")
+
+trip_id_egress_gartenfeld_dng_siba <- unique(egress_gartenfeld_dng_siba$trip_id)
+
+walk_mode_from_gartenfeld_dng_siba <- legs_siba %>% 
+  filter(trip_id %in% trip_id_egress_gartenfeld_dng_siba) %>% 
+  filter(mode == "walk" & start_link == "pt_116440_SuburbanRailway")
+
+walk_mode_gartenfeld_dng_siba <- bind_rows(
+  walk_mode_to_gartenfeld_dng_siba, 
+  walk_mode_from_gartenfeld_dng_siba
+  ) %>% 
+  summarise(
+    avg_walking_time = mean(trav_time),
+    avg_walking_distance = mean(distance)
+    )
+
+pt_users_siba <- trips_siba %>% 
+  filter(main_mode == "pt")
+
+trip_id_pt_users_siba <- unique(pt_users_siba$trip_id)
+
+walk_mode_to_pt_users_siba <- legs_siba %>% 
+  filter(trip_id %in% trip_id_pt_users_siba) %>% 
+  filter(mode == "walk") %>%
+  filter(!grepl("^pt", start_link) & grepl("rail$|subway$|SuburbanRailway$|tram$", end_link))
+
+walk_mode_from_pt_users_siba <- legs_siba %>% 
+  filter(trip_id %in% trip_id_pt_users_siba) %>% 
+  filter(mode == "walk") %>%
+  filter(grepl("rail$|subway$|SuburbanRailway$|tram$", start_link) & !grepl("^pt", end_link))
+
+walk_mode_pt_users_siba <- bind_rows(
+  walk_mode_to_pt_users_siba, 
+  walk_mode_from_pt_users_siba
+  ) %>% 
+  summarise(
+    avg_walking_time = mean(trav_time),
+    avg_walking_distance = mean(distance)
+    )
+
