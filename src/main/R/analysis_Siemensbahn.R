@@ -78,8 +78,17 @@ base_case_total_score <- persons_base_case %>%
   filter(grepl("^(berlin|dng|bb).+", person)) %>%
   summarise(total_score = sum(executed_score))
 
+base_case_total_score_delimited_region <- persons_base_case %>% 
+  filter(person %in% persons_delimited_region) %>%
+  summarise(total_score = sum(executed_score))
+
 # Total Score for DNG-Agents
 base_case_total_score_dng <- persons_base_case %>% 
+  filter(grepl("^dng.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+base_case_total_score_dng_delimited_region <- persons_base_case %>% 
+  filter(person %in% persons_delimited_region) %>%
   filter(grepl("^dng.+", person)) %>%
   summarise(total_score = sum(executed_score))
 
@@ -88,8 +97,18 @@ base_case_total_score_berlin <- persons_base_case %>%
   filter(grepl("^berlin.+", person)) %>%
   summarise(total_score = sum(executed_score))
 
+base_case_total_score_berlin_delimited_region <- persons_base_case %>% 
+  filter(person %in% persons_delimited_region) %>%
+  filter(grepl("^berlin.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
 # Total Score for BB-Agents
 base_case_total_score_bb <- persons_base_case %>% 
+  filter(grepl("^bb.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+base_case_total_score_bb_delimited_region <- persons_base_case %>% 
+  filter(person %in% persons_delimited_region) %>%
   filter(grepl("^bb.+", person)) %>%
   summarise(total_score = sum(executed_score))
 
@@ -100,6 +119,10 @@ base_case_total_score_results <- data.frame(
   'Total Score DNG-Agents' = as.numeric(base_case_total_score_dng),
   'Total Score Berlin-Agents' = as.numeric(base_case_total_score_berlin),
   'Total Score BB-Agents' =  as.numeric(base_case_total_score_bb),
+  'Total Score - Delimited Region' = as.numeric(base_case_total_score_delimited_region),
+  'Total Score DNG-Agents - Delimited Region' = as.numeric(base_case_total_score_dng_delimited_region),
+  'Total Score Berlin-Agents - Delimited Region' = as.numeric(base_case_total_score_berlin_delimited_region),
+  'Total Score BB-Agents - Delimited Region' =  as.numeric(base_case_total_score_bb_delimited_region),
   check.names = FALSE)
 
 # Filtering out the agents that start or end a trip within the Delimited Region - Trips
@@ -267,8 +290,17 @@ siba_total_score <- persons_siba %>%
   filter(grepl("^(berlin|dng|bb).+", person)) %>%
   summarise(total_score = sum(executed_score))
 
+siba_total_score_delimited_region <- persons_siba %>% 
+  filter(person %in% persons_delimited_region) %>%
+  summarise(total_score = sum(executed_score))
+
 # Total Score for DNG-Agents
 siba_total_score_dng <- persons_siba %>% 
+  filter(grepl("^dng.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+siba_total_score_dng_delimited_region <- persons_siba %>% 
+  filter(person %in% persons_delimited_region) %>%
   filter(grepl("^dng.+", person)) %>%
   summarise(total_score = sum(executed_score))
 
@@ -277,8 +309,18 @@ siba_total_score_berlin <- persons_siba %>%
   filter(grepl("^berlin.+", person)) %>%
   summarise(total_score = sum(executed_score))
 
+siba_total_score_berlin_delimited_region <- persons_siba %>% 
+  filter(person %in% persons_delimited_region) %>%
+  filter(grepl("^berlin.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
 # Total Score for BB-Agents
 siba_total_score_bb <- persons_siba %>% 
+  filter(grepl("^bb.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+siba_total_score_bb_delimited_region <- persons_siba %>% 
+  filter(person %in% persons_delimited_region) %>%
   filter(grepl("^bb.+", person)) %>%
   summarise(total_score = sum(executed_score))
 
@@ -289,6 +331,10 @@ siba_total_score_results <- data.frame(
   'Total Score DNG-Agents' = as.numeric(siba_total_score_dng),
   'Total Score Berlin-Agents' = as.numeric(siba_total_score_berlin),
   'Total Score BB-Agents' =  as.numeric(siba_total_score_bb),
+  'Total Score - Delimited Region' = as.numeric(siba_total_score_delimited_region),
+  'Total Score DNG-Agents - Delimited Region' = as.numeric(siba_total_score_dng_delimited_region),
+  'Total Score Berlin-Agents - Delimited Region' = as.numeric(siba_total_score_berlin_delimited_region),
+  'Total Score BB-Agents - Delimited Region' =  as.numeric(siba_total_score_bb_delimited_region),
   check.names = FALSE)
 
 # Monetized score for agents with trips starting or ending within the Delimited Region
@@ -380,8 +426,17 @@ siba_v1_total_score <- persons_siba_v1 %>%
   filter(grepl("^(berlin|dng|bb).+", person)) %>%
   summarise(total_score = sum(executed_score))
 
+siba_v1_total_score_delimited_region <- persons_siba_v1 %>% 
+  filter(person %in% persons_delimited_region) %>%
+  summarise(total_score = sum(executed_score))
+
 # Total Score for DNG-Agents
 siba_v1_total_score_dng <- persons_siba_v1 %>% 
+  filter(grepl("^dng.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+siba_v1_total_score_dng_delimited_region <- persons_siba_v1 %>% 
+  filter(person %in% persons_delimited_region) %>%
   filter(grepl("^dng.+", person)) %>%
   summarise(total_score = sum(executed_score))
 
@@ -390,8 +445,18 @@ siba_v1_total_score_berlin <- persons_siba_v1 %>%
   filter(grepl("^berlin.+", person)) %>%
   summarise(total_score = sum(executed_score))
 
+siba_v1_total_score_berlin_delimited_region <- persons_siba_v1 %>% 
+  filter(person %in% persons_delimited_region) %>%
+  filter(grepl("^berlin.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
 # Total Score for BB-Agents
 siba_v1_total_score_bb <- persons_siba_v1 %>% 
+  filter(grepl("^bb.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+siba_v1_total_score_bb_delimited_region <- persons_siba_v1 %>% 
+  filter(person %in% persons_delimited_region) %>%
   filter(grepl("^bb.+", person)) %>%
   summarise(total_score = sum(executed_score))
 
@@ -402,6 +467,10 @@ siba_v1_total_score_results <- data.frame(
   'Total Score DNG-Agents' = as.numeric(siba_v1_total_score_dng),
   'Total Score Berlin-Agents' = as.numeric(siba_v1_total_score_berlin),
   'Total Score BB-Agents' =  as.numeric(siba_v1_total_score_bb),
+  'Total Score - Delimited Region' = as.numeric(siba_v1_total_score_delimited_region),
+  'Total Score DNG-Agents - Delimited Region' = as.numeric(siba_v1_total_score_dng_delimited_region),
+  'Total Score Berlin-Agents - Delimited Region' = as.numeric(siba_v1_total_score_berlin_delimited_region),
+  'Total Score BB-Agents - Delimited Region' =  as.numeric(siba_v1_total_score_bb_delimited_region),
   check.names = FALSE)
 
 # Monetized score for agents with trips starting or ending within the Delimited Region
@@ -493,8 +562,17 @@ siba_v2_total_score <- persons_siba_v2 %>%
   filter(grepl("^(berlin|dng|bb).+", person)) %>%
   summarise(total_score = sum(executed_score))
 
+siba_v2_total_score_delimited_region <- persons_siba_v2 %>% 
+  filter(person %in% persons_delimited_region) %>%
+  summarise(total_score = sum(executed_score))
+
 # Total Score for DNG-Agents
 siba_v2_total_score_dng <- persons_siba_v2 %>% 
+  filter(grepl("^dng.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+siba_v2_total_score_dng_delimited_region <- persons_siba_v2 %>% 
+  filter(person %in% persons_delimited_region) %>%
   filter(grepl("^dng.+", person)) %>%
   summarise(total_score = sum(executed_score))
 
@@ -503,8 +581,18 @@ siba_v2_total_score_berlin <- persons_siba_v2 %>%
   filter(grepl("^berlin.+", person)) %>%
   summarise(total_score = sum(executed_score))
 
+siba_v2_total_score_berlin_delimited_region <- persons_siba_v2 %>% 
+  filter(person %in% persons_delimited_region) %>%
+  filter(grepl("^berlin.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
 # Total Score for BB-Agents
 siba_v2_total_score_bb <- persons_siba_v2 %>% 
+  filter(grepl("^bb.+", person)) %>%
+  summarise(total_score = sum(executed_score))
+
+siba_v2_total_score_bb_delimited_region <- persons_siba_v2 %>% 
+  filter(person %in% persons_delimited_region) %>%
   filter(grepl("^bb.+", person)) %>%
   summarise(total_score = sum(executed_score))
 
@@ -515,6 +603,10 @@ siba_v2_total_score_results <- data.frame(
   'Total Score DNG-Agents' = as.numeric(siba_v2_total_score_dng),
   'Total Score Berlin-Agents' = as.numeric(siba_v2_total_score_berlin),
   'Total Score BB-Agents' =  as.numeric(siba_v2_total_score_bb),
+  'Total Score - Delimited Region' = as.numeric(siba_v2_total_score_delimited_region),
+  'Total Score DNG-Agents - Delimited Region' = as.numeric(siba_v2_total_score_dng_delimited_region),
+  'Total Score Berlin-Agents - Delimited Region' = as.numeric(siba_v2_total_score_berlin_delimited_region),
+  'Total Score BB-Agents - Delimited Region' =  as.numeric(siba_v2_total_score_bb_delimited_region),
   check.names = FALSE)
 
 # Monetized score for agents with trips starting or ending within the Delimited Region
@@ -800,13 +892,6 @@ siba_v2_base_case_total_trav_time_switching_pt_from_other_modes <- siba_v2_base_
             total_pt_trav_time.siba_v2 = sum(person_trav_time.siba_v2) * 10 / 3600) # (results may show [secs], but it's [hours]!!)
                                                                                     # (* sample upscale factor 10)
 
-# Agents switching to SiBa
-
-# [Siemensbahn] vs [Base Case] - Former car users in [Base Case] using SiBa-Line in [Siemensbahn]
-siba_base_case_switching_siba <- legs_siba %>% 
-  filter(person %in% siba_base_case_switching_pt_list) %>% 
-  filter(grepl("^SiBa", transit_line, ignore.case = TRUE))
-
 ## Transfers ##
 
 # Agents remaining in pt
@@ -952,21 +1037,6 @@ siba_base_case_former_car_users_persons_without_pt_abo_list <-
   siba_base_case_switching_pt_list[!siba_base_case_switching_pt_list %in% 
                                      siba_base_case_former_car_users_persons_with_pt_abo_list]
 
-'# How many former non-car non-pt users in [Base Case] switching to pt in [Siemensbahn] already used pt before?
-siba_base_case_former_other_modes_users_persons_with_pt_abo <- trips_base_case %>% 
-  filter(
-    person %in% siba_base_case_switching_pt_from_other_modes_list,
-    main_mode == "pt") 
-
-siba_base_case_former_other_modes_users_persons_with_pt_abo_list <- 
-  unique(siba_base_case_former_other_modes_users_persons_with_pt_abo$person)
-
-siba_base_case_former_other_modes_users_persons_without_pt_abo_list <- 
-  siba_base_case_switching_pt_list[!siba_base_case_switching_pt_from_other_modes_list %in% 
-                                     siba_base_case_former_other_modes_users_persons_with_pt_abo_list]
-
-rm(list=ls(pattern="siba_base_case_former_other_modes_users_persons"))'
-
 ## Outliers ##
 
 siba_base_case_total_score_berlin_outliers <- persons_base_case %>% 
@@ -1000,56 +1070,6 @@ train_occupancy_pax_sibalines_siba_v2 <- pt_pax_volumes_siba_v2 %>%
   filter(grepl("SiBa", transitLine)) %>% 
   summarise(max_ridership = max(passengersAtArrival)) 
 
-'# Legs file
-train_occupancy_legs_base_case <- legs_base_case %>% 
-  filter(grepl("Base_Case", transit_line)) %>% 
-  mutate(hour = hour(dep_time)) %>% 
-  count(hour, transit_line, person = "passengers") %>% 
-  arrange(hour, transit_line) %>% 
-  mutate(n = n * 10) # (* sample upscale factor 10)
-
-train_occupancy_legs_siba <- legs_siba %>% 
-  filter(grepl("SiBa", transit_line)) %>% 
-  mutate(hour = hour(dep_time)) %>% 
-  count(hour, transit_line, person = "passengers") %>% 
-  arrange(hour, transit_line) %>% 
-  mutate(n = n * 10) # (* sample upscale factor 10)
-
-ggplot(train_occupancy_legs_siba, aes(x = hour, y = n, fill = transit_line)) +
-  geom_col(position = "dodge") +
-  labs(
-    title = "SiBa-Line - Usage by Hour",
-    x = "Hour of Day",
-    y = "Number of Passengers",
-    fill = "Direction"
-  ) +
-  scale_fill_discrete(
-    labels = c("SiBa_e_w" = "Hauptbahnhof > Gartenfeld", "SiBa_w_e" = "Gartenfeld > Hauptbahnhof")
-    ) +
-  theme_minimal() +
-  scale_x_continuous(breaks = 0:23)
-
-train_occupancy_legs_siba_v1 <- legs_siba_v1 %>% 
-  filter(grepl("SiBa", transit_line)) %>% 
-  mutate(hour = hour(dep_time)) %>% 
-  count(hour, transit_line, person = "passengers") %>% 
-  arrange(hour, transit_line) %>% 
-  mutate(n = n * 10) # (* sample upscale factor 10)
-
-ggplot(train_occupancy_legs_siba_v1, aes(x = hour, y = n, fill = transit_line)) +
-  geom_col(position = "dodge") +
-  labs(
-    title = "SiBa-Line - Usage by Hour",
-    x = "Hour of Day",
-    y = "Number of Passengers",
-    fill = "Direction"
-  ) +
-  scale_fill_discrete(
-    labels = c("SiBa_e_w" = "Hauptbahnhof > Gartenfeld", "SiBa_w_e" = "Gartenfeld > Hauptbahnhof")
-  ) +
-  theme_minimal() +
-  scale_x_continuous(breaks = 0:23)'
-
 ## DNG Agents ##
 
 access_gartenfeld_dng_siba <- legs_siba %>% 
@@ -1079,7 +1099,7 @@ walk_mode_gartenfeld_dng_siba <- bind_rows(
   walk_mode_from_gartenfeld_dng_siba
   ) %>% 
   summarise(
-    avg_walking_time = mean(trav_time),
+    avg_walking_time = mean(trav_time) / 60, # Results may show secs, but it's [min]!!
     avg_walking_distance = mean(distance)
     )
 
@@ -1091,80 +1111,23 @@ trip_id_pt_users_siba <- unique(pt_users_siba$trip_id)
 walk_mode_to_pt_users_siba <- legs_siba %>% 
   filter(trip_id %in% trip_id_pt_users_siba) %>% 
   filter(mode == "walk") %>%
-  filter(!grepl("^pt", start_link) & grepl("rail$|subway$|SuburbanRailway$|tram$", end_link))
+  filter(!grepl("^pt", start_link) & grepl("rail$|subway$|SuburbanRailway$", end_link))
 
 walk_mode_from_pt_users_siba <- legs_siba %>% 
   filter(trip_id %in% trip_id_pt_users_siba) %>% 
   filter(mode == "walk") %>%
-  filter(grepl("rail$|subway$|SuburbanRailway$|tram$", start_link) & !grepl("^pt", end_link))
+  filter(grepl("rail$|subway$|SuburbanRailway$", start_link) & !grepl("^pt", end_link))
 
 walk_mode_pt_users_siba <- bind_rows(
   walk_mode_to_pt_users_siba, 
   walk_mode_from_pt_users_siba
   ) %>% 
   summarise(
-    avg_walking_time = mean(trav_time),
+    avg_walking_time = mean(trav_time) / 60, # Results may show secs, but it's [min]!!
     avg_walking_distance = mean(distance)
     )
 
-# Filtering out the agents that start or end a trip within the Delimited Region - Legs from all scenarios
-legs_base_case_sf <- legs_base_case  %>%
-  filter(grepl("^(berlin|dng|bb).+", person), 
-         !is.na(start_x) & !is.na(start_y) & !is.na(end_x) & !is.na(end_y)) 
-
-legs_base_case_start_sf <- legs_base_case_sf %>%
-  st_as_sf(coords = c("start_x","start_y"), crs = 25832) %>% 
-  st_intersection(delimited_region_shp)
-
-legs_base_case_end_sf <- legs_base_case_sf %>%
-  st_as_sf(coords = c("end_x","end_y"), crs = 25832) %>% 
-  st_intersection(delimited_region_shp)
-
-legs_siba_sf <- legs_siba  %>%
-  filter(grepl("^(berlin|dng|bb).+", person), 
-         !is.na(start_x) & !is.na(start_y) & !is.na(end_x) & !is.na(end_y)) 
-
-legs_siba_start_sf <- legs_siba_sf %>%
-  st_as_sf(coords = c("start_x","start_y"), crs = 25832) %>% 
-  st_intersection(delimited_region_shp)
-
-legs_siba_end_sf <- legs_siba_sf %>%
-  st_as_sf(coords = c("end_x","end_y"), crs = 25832) %>% 
-  st_intersection(delimited_region_shp)
-
-legs_siba_v1_sf <- legs_siba_v1  %>%
-  filter(grepl("^(berlin|dng|bb).+", person), 
-         !is.na(start_x) & !is.na(start_y) & !is.na(end_x) & !is.na(end_y)) 
-
-legs_siba_v1_start_sf <- legs_siba_v1_sf %>%
-  st_as_sf(coords = c("start_x","start_y"), crs = 25832) %>% 
-  st_intersection(delimited_region_shp)
-
-legs_siba_v1_end_sf <- legs_siba_v1_sf %>%
-  st_as_sf(coords = c("end_x","end_y"), crs = 25832) %>% 
-  st_intersection(delimited_region_shp)
-
-legs_siba_v2_sf <- legs_siba_v2  %>%
-  filter(grepl("^(berlin|dng|bb).+", person), 
-         !is.na(start_x) & !is.na(start_y) & !is.na(end_x) & !is.na(end_y)) 
-
-legs_siba_v2_start_sf <- legs_siba_v2_sf %>%
-  st_as_sf(coords = c("start_x","start_y"), crs = 25832) %>% 
-  st_intersection(delimited_region_shp)
-
-legs_siba_v2_end_sf <- legs_siba_v2_sf %>%
-  st_as_sf(coords = c("end_x","end_y"), crs = 25832) %>% 
-  st_intersection(delimited_region_shp)
-
-persons_delimited_region_all_scenarios <- c(legs_base_case_start_sf$person,legs_base_case_end_sf$person,
-                                            legs_siba_start_sf$person,legs_siba_end_sf$person,
-                                            legs_siba_v1_start_sf$person,legs_siba_v1_end_sf$person,
-                                            legs_siba_v2_start_sf$person,legs_siba_v2_end_sf$person)
-
-persons_delimited_region_legs <- unique(persons_delimited_region_all_scenarios)
-
-# SiBa Users in comparison to persons_delimited_region_legs
-
+# SiBa Users in comparison to persons_delimited_region
 pax_sibalines_base_case <- legs_base_case %>% 
   filter(grepl("Base_Case", transit_line))
 
@@ -1195,10 +1158,40 @@ match_percentage <- function(char_list, reference_list) {
 }
 
 percentages <- c(
-  pax_sibalines_base_case_persons = match_percentage(pax_sibalines_base_case_persons, persons_delimited_region_legs),
-  pax_sibalines_siba_persons = match_percentage(pax_sibalines_siba_persons, persons_delimited_region_legs),
-  pax_sibalines_siba_v1_persons = match_percentage(pax_sibalines_siba_v1_persons, persons_delimited_region_legs),
-  pax_sibalines_siba_v2_persons = match_percentage(pax_sibalines_siba_v2_persons, persons_delimited_region_legs)
+  pax_sibalines_base_case_persons = match_percentage(pax_sibalines_base_case_persons, persons_delimited_region),
+  pax_sibalines_siba_persons = match_percentage(pax_sibalines_siba_persons, persons_delimited_region),
+  pax_sibalines_siba_v1_persons = match_percentage(pax_sibalines_siba_v1_persons, persons_delimited_region),
+  pax_sibalines_siba_v2_persons = match_percentage(pax_sibalines_siba_v2_persons, persons_delimited_region)
 )
 
 print(percentages)
+
+# Map with all agents
+
+tmap_mode("view")
+
+tm_shape(delimited_region_shp) + 
+  tm_polygons(alpha = 0.3, col = "lightgreen") +
+  tm_text("OTEIL",
+          size = 1.2,             
+          col = "black",        
+          fontface = "bold",
+          xmod = 1.0,
+          ymod = -1.5) +
+  # Base Case
+  tm_shape(siemensbahn_kml[siemensbahn_kml$Name == track_names[1] & st_geometry_type(siemensbahn_kml) == "LINESTRING", ]) +
+  tm_lines(col = colors[1], lwd = 3) +
+  # Siemensbahn
+  tm_shape(siemensbahn_kml[siemensbahn_kml$Name == track_names[2] & st_geometry_type(siemensbahn_kml) == "LINESTRING", ]) +
+  tm_lines(col = colors[2], lwd = 3) +
+  # Variant 1
+  tm_shape(siemensbahn_kml[siemensbahn_kml$Name == track_names[3] & st_geometry_type(siemensbahn_kml) == "LINESTRING", ]) +
+  tm_lines(col = colors[3], lwd = 3) +
+  # Variant 2
+  tm_shape(siemensbahn_kml[siemensbahn_kml$Name == track_names[4] & st_geometry_type(siemensbahn_kml) == "LINESTRING", ]) +
+  tm_lines(col = colors[4], lwd = 3) +
+  # All agents
+  tm_shape(base_case_score_monetized_sf) +
+  tm_bubbles(col = "gray40", size = 0.005, alpha = 1, border.alpha = 0) +
+  # Title
+  tm_layout(title = "Agents Distribution")
